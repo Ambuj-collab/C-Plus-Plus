@@ -1,0 +1,53 @@
+This is where we are going to be showing you how to install the MinGW 64 compiler. Open the below link in your favourite browser.
+	https://winlibs.com/
+	
+This is a library where they've got standalone builds of GCC and MinGW 64 for Windows. Click on Download link on the above opened webpage. Download latest GCC based on your OS architecture.
+	https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-19.1.1-12.0.0-ucrt-r2/winlibs-x86_64-posix-seh-gcc-14.2.0-llvm-19.1.1-mingw-w64ucrt-12.0.0-r2.zip
+	
+Extract the download zip file, store it in a place and then update the Windows path environment variable with the bin folder path. 
+
+That's it, our compiler is installed, we can test it really quickly. Open command prompt and check the version of the compiler.
+	g++ --version
+
+Next, install CodeLite IDE:  https://codelite.org/
+
+I installed CodeLite on Windows and I created a shortcut icon on my desktop right here. So if I double click that, that's going to open up and run CodeLite. And the first time you run it, you're going to get a setup wizard. It's going to look something like this, it says welcome to the setup wizard, you can bypass the setup wizard but let's run it. We'll select Next and we'll select "C/C++ development", select next again. Now, in this step, you can scan for compilers. And the idea here is we've got a compiler installed on our system. CodeLite needs to configure itself to work with that compiler. So, we'll select Scan. Most of the time, it will not find and in this case, it did not find, it's okay, just like expected. Just close the pop-up window. Click Next. Click Next. Click Finish. 
+
+Let's configure our compiler in CodeLite by following steps.
+	Settings > Build Settings... > Compilers tab > Click on + icon > Select the bin folder of the GCC compiler > Name the compiler, for example, MinGW > Select OK > Click OK
+
+Now, we're in a position where we can start creating workspace, creating projects, writing code and so forth.
+
+Create a new workspace > C++ type workspace > Click OK > Give workspace path and workspace name > Click OK
+
+Select the created workspace > Right Click > New > New Project > Provide project name > Set the Category as Console because we want to build console based application > Select Type as Simple executable(g++) > Select Compiler which you added above, for example, MinGW > Select Debugger as GNU gdb debugger > Select Build System as CodeLite Makefile Generator > Click OK
+
+Expand your created workspace > Expand your created project > Expand src folder > Open main.cpp > Add the below code	
+	#include <iostream>
+	
+	using namespace std;
+	
+	int main() {
+		cout << "Hello world!" << endl;
+		return 0;
+	}
+	
+Before we do the build, we need to configure our compiler in the project settings. So, what we can do is? Remember, it's possible that we have a lot of projects in here(i.e., inside the workspace). There's only going to be one active project at a time and that's the one that is bold and italicized, and there's only one right now that you can see it right here(i.e., inside the workspace). You can always right click on that(i.e., your project) and make it active. And by double clicking on it(i.e., your project), you can choose which project you want to build. Again, we can have 20 or 30 projects, we just double click them, that's the one we want. So let's configure this project. So make sure that you've selected your project. You can right click and come down to settings, you can see the wrench icon there. So again, I'm going to just click that icon. And now, we get this project settings menu. I know this looks like a lot to do right now and it is in a sense but in a while, we won't have to do any of this because we're going to create a template project that we can use to create new projects from and I'll do that in a couple of videos from now which makes it really easy to do. So what we want to do here is? We want to make one change to this. We want to modify the working directory's value right here, delete the whole thing and just type in $(ProjectPath). Select Apply and OK. Now, we want to set up the compiler option. Again open Project Settings and select the Compiler. We are going to modify C++ Compiler Options's value. Double click to modify. You will see these three little dots that pop up right here in a button. Click on that. We've got a whole bunch of options that we can select from. We're only going to select one more and that's Enable C++17 features[-std=c++17]. And you can see down here in the command line, those are the options that are going to be used by the compiler to build the program. Select OK. Select Apply and OK.
+
+Now, we can build and run the above program. So how do we do that? Make sure that your project which you want to run is the active project. Click on Build > Rebuild Project. We get the output window come up down here and you can see that it successfully has created a program.
+
+Now, what we can do is? We can run this program. So, let me close the output window and I'm going to select Build > Run , it's going to ask me, you want to Build and Execute it or just Execute it? I just want to Execute it because I've already built it. A window pops up and it says Hello World. This tells you that your build environment is set up, your compiler is set up, everything's working, everything looks good.
+
+Let's create another project. You'll notice 1st project is the active project, you will see how it's bold and italicized, I can just double click on 2nd project. And now, 2nd project is the one that's bold and italicized right there, so it's the active project. So when I build and run, 2nd project is the one that's going to be affected. You can go and check the Project Settings of 2nd project. Whatever settings we have done for 1st project, same settings need to be done on 2nd project as well. 
+
+In the project settings, you might want to select the Linker and modify Linker Options's value to -static, that's up to you. I would recommend you to do so because it's going to avoid problems with finding DLLs
+
+
+Static and Dynamic linking:
+==============================
+Static generally refers to something that happens before the code executes.
+
+Dynamic generally refers to something that happens during the execution of the program.
+
+In the case of static linking, libraries are linked statically --before the program is executed.
+In the case of dynamic linking, libraries are lined dynamically -- when the program executes.

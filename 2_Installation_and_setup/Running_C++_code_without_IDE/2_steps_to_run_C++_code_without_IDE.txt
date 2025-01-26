@@ -1,0 +1,35 @@
+Now, we'll use the command line tools to compile and run our C++ programs on the Windows platform. Now obviously we need some sort of editor to type in our code. I'm just going to use Notepad or Notepad++ which is built into Windows and it's really really easy to use.
+
+1) Create main.cpp file.
+2) Open main.cpp file and add the following code:
+	#include <iostream>
+	
+	int main() {
+		std::cout << "Hello windows command line" << std::endl;
+		return 0;
+	}
+	
+3) Now we need to compile and run this. Open Command Prompt and navigate to the directory where main.cpp file is there.
+4) Let's compile the code by using the below command:
+	g++ -Wall -std=c++14 main.cpp     -->  this will create a.exe file
+	
+   Note: 
+		-Wall  		 -->  this option is for turning all warnings
+		-std=c++14   -->  this option is to tell to use C++14 standard
+	
+5) a.exe is our executable. We can run it by just saying file name
+	a   -->  run this in command prompt
+	
+
+If you want a different name for the output executable file, we could just put another option on the command line.
+	g++ -Wall -std=c++14 main.cpp -o main.exe     -->  this will create main.exe file
+	
+	main	-->  running executable file in command prompt
+
+
+Note:
+	The -Wall option turns on all warnings
+
+	The -std=c++14 tells the compiler to use the C++14 standard
+
+	Without these options the compiler will use an older standard and not display all warning message.

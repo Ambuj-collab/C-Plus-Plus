@@ -1,0 +1,49 @@
+#include <iostream>
+
+int main() {
+	int favorite_number;
+	
+	std:cout << "Enter your favorite number between 1 and 100: ";
+	
+	std::cin >> favorite_number;
+	
+	std::cout << "Amazing!! That's my favorite number too!" << std::endl;
+	
+	return 0;
+}
+
+
+
+Notes:
+	1) We're asking the user to enter their favorite number between 1 and 100. We're getting that number and storing it in a variable called favorite number. And then we're just saying amazing that's my favorite number too. So it's really really simple program. 
+
+	2) Why did we include 'iostream'?  Because we need the input/output libraries. We can't do IO without it. So we're including it. Now the compiler understands about input and output. It understands cout and cin as they are defined in 'iostream'.
+	
+	3) << is insertion operator which inserts something into that output stream.
+	
+	4) >> is extraction operator which extracts something from that input stream.
+	
+	5) std::endl  ->  flushes the output buffer
+	
+	6) :: is scope resolution operator.
+
+	7) Now next thing to do is to build this program. Program is not going to run up by itself. We need to compile it. We need to link it. And then we need to execute it. That whole process of compiling and linking is called building. What we need to do next is to build the project by compiling and linking, that's going to create the exe file on windows or the executable files on Linux and mac.
+	
+	8) Now if you recall building means compiling, linking together with extra libraries and external files if we need to and creating an executable file. That's what building is all about. There are several steps involved with building. The first one obviously is compiling. If we can't get a clean compile then there's no way we're going to build the system. So we want to be able to compile successfully and then link to create the exe file. Finally, we can run our executable.
+	
+	9) You can compile a single C++ source file, in CodeLite, by Right Click on that source file > Compile
+	
+	10) There are also a lot of things you could do at the project level in CodeLite. So if I select the project and right click, you can see that we have Build, Rebuild, Clean, Stop Build and so forth.
+	
+	11) Each C++ source file needs to be compiled into an object file. The object files resulting from the compilation of multiple source files are then linked into an executable, a shared library, or a static library. C++ source files generally have the .cpp. A C++ source file can include other files, known as header files, with the #include directive. Header files have extensions like .h, .hpp or have no extension at all like in the C++ standard library and other libraries' header files (like Qt). The extension doesn’t matter for the C++ preprocessor, which will literally replace the line containing the #include directive with the entire content of the included file.
+	
+	12) Let's talk about clean first. Think about this. When I compile a c++ program, I'm converting the .cpp source code to an object format, right. A machine  or low level language. That's going to create a .o file or a .obj file, as we mentioned in previous lectures. That's the purpose of compiling. Now as your programs are compiled, they will have many of these object files(.o or .obj). The clean process removes all those object files and puts your project in a clean state. In other words, source code only. No object files. Now why is this important. It's important because when you compile your programs and build your programs, sometimes you want to do a clean build. What that means is I want to start from a position where nothing has been built. I just want to clean everything out.
+	
+	Now when we're working with a single .cpp file here, it's pretty much a moot point because it's just one file. But typically, c++ programs are very large and you've got a lot of c++ files. Each one of them is being compiled to an object format and when you say, hey compiler build for me, the compiler is only going to build exactly what it needs to build. So if it realizes that this source code already has an object file associated with it and the source code hasn't changed, then why bother building it again, right. So it's not going to build it and it does that to be efficient, which makes a lot of sense. But occasionally, you want to do a clean that removes all of that stuff. It removes the .exe that was created and then you want to build again. So now we're going to get a clean build. Again, this is really not an issue here when we've got one .cpp file. But if you've got thousands and  thousands and thousands of files, there can be a significant difference in the amount of time that it takes to do that build.
+	
+	13) Then we can do build. Now when I want to build the project, I can right click on the project and say Build. Now what's going to happen here is it's going to go through your project, looking at all the c++ files and only build what it needs to build. Now ,in this case, it's going to build everything because it's just the one file and I haven't built it yet. But it's going to not build what it doesn't need to build and that's important to understand.
+	
+	14) Rebuild is the combination of a clean and a build. So when you say, hey rebuild the project, it's going to do a clean, it's going to clean everything out and then it's going to build it again.
+	
+	15) You can select Build Configuration in CodeLite. There are two build configuration we have: Debug and Release. You can choose either one. We're going to use debug throughout the entire course because that's what we're doing. We're basically developing right now. Release is when you want to release the files to production for your users to use. So in this case, Debug build configuration creates that debug folder, when you build in CodeLite, that you saw a little bit ago. If we do build in Release mode(i.e., build configuration), we'll get a release folder as well. So we can have 2 .exe. Now the difference is that the debug configuration creates object files that has debugging information in them. It's got all those variable names and stuff. So later on, when we debug our program, we can have all that information available to us and it makes us very, very productive and it really helps us debug and test our code. The release configuration removes all of that stuff and it does more optimizations, it just makes your .exe leaner and meaner. So that you don't need all that debugging information at runtime. So like I said we're going to use Debug build configuration.
+	

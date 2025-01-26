@@ -1,0 +1,10 @@
+Now, I will create a default project template, in CodeLite, that we can then use to create new projects from. This makes us so much more productive and a lot less chances for errors as well. So we're going to create the project, save it as a template, then when we create new projects, we'll use that template as the base. So let's get started.
+
+Create a project and do all the settings to that project > Right Click on your project > Save As Template... > Give the project name(i.e., for example, DefaultProject) and project category as User templates > You may give some description > Click OK.
+
+Now, we can create new projects from that template, so let's do that.
+
+Click on your workspace > Right Click > New > New Project > Give name to your project > Select Category as User template > Select Type as [template_name] > Double check rest of the things as they would be populated from the template > Click OK.
+
+You can cross check the Settings of the project created from the template.
+ 

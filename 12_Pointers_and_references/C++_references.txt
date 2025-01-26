@@ -1,0 +1,29 @@
+Code snippet:
+===============	
+	vector<string> stooges {"Larry", "Moe", "Curly"};
+	for (auto str: stooges)
+		str = "Funny"; 	  // changes the copy
+	for (auto str:stooges)
+		cout << str << endl; 	// Larry, Moe, Curly
+	
+References are often used in range-based for loops to access collection elements inside each iteration. Above is an example of a range-based for loop that does not use references. In this case, we have a vector of c++ string objects named stooges, and it's initialized to Larry, Moe and Curly. Then we use a range-based for loop to iterate through the vector. At each iteration, we assign Funny to each vector element. Then we have another range-based for loop that displays the contents of the stooges vector. Notice the output, nothing changed. We didn't change the vector at all, even though we assigned Funny to each element in the 1st loop. So what's going on. The problem is that the str variable name in the first loop is a copy for each of the vector elements as we loop through them. So we're setting the copy to Funny, but we're never changing the actual elements in the vector.
+
+Code snippet:
+===============	
+	vector<string> stooges {"Larry", "Moe", "Curly"};
+	for (auto &str: stooges)
+		str = "Funny"; // changes the actual
+	for (auto str:stooges)
+		cout << str << endl; // Funny, Funny, Funny
+
+Now let's see how we can use references to actually change the vector elements. Here we have the same example, except that the str variable in the first loop is now a reference. In this case, a reference to each of the c++ string objects. Now str is an alias for those objects, and when we assign Funny to str, we're actually changing the vector elements.
+
+Code snippet:
+===============	
+	vector<string> stooges {"Larry", "Moe", "Curly"};
+	for (auto const &str: stooges)
+		str = "Funny"; // compiler error
+
+Notice what happens if we add the const qualifier to the loop variable in the first loop. Now we're preventing any change to the data in the vector because the compiler marks it as read-only. So this code now gives us a compiler error.
+
+Also by using a reference, we're not incurring the cost of copying each vector element in each loop iteration. Unless you have a specific reason to copy elements in range-based for loops, you should use reference variables to make your code more efficient. And if you aren't going to modify the collection elements, make the reference const.

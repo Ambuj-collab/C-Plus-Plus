@@ -1,0 +1,14 @@
+Now, we'll look at basic input output using cin and cout. cout, cin, cerr and clog are defined in the c++ standard(i.e., std). To use them, you must include iostream header file. C++ uses a stream abstraction to handle IO on devices like the console and keyboard. cout is an output stream that defaults to the console or the screen. cerr and clog are also output streams that default to standard error and standard log respectively. And finally, cin is an input stream that defaults to the keyboard. The insertion operator is used with output streams and the extraction operator is used with input streams.
+
+It's important to understand that the insertion operator does not automatically add line breaks to move to the next line on the console. You must do this explicitly either by using the endl manipulator or by including a new line character(i.e., \n). If you use the endl stream manipulator, it will also flush the stream, this is important to know since if the stream is buffered, it may not get written to the console until it's flushed.
+
+Notes:
+	A buffer is a temporary storage location for data in a computer program. It's used to store data as it's being moved from one place to another, such as between devices or between a device and an app.
+	
+	Flushing output on a buffered stream means transmitting all accumulated characters to the file. There are many circumstances when buffered output on a stream is flushed automatically. endl Clears buffers for this cout output stream and causes any buffered data to be written to the file.
+	
+Remember, cin is by default tied to your keyboard. We can redirect it as we wish but, by default, it's the keyboard. Now what happens is characters are read from your keyboard, and they're not read directly by cin, they're stored in a buffer. This is done to make the program more efficient. So if I type in 153 on the keyboard, then what happens is, the numbers are read from the buffer, the characters(i.e., 153) in this case are read from the buffer.
+	int num1;
+	cin >> num1;
+	
+The compiler knows that num1 is an integer. So it's going to read those characters, and it's only going to process what makes sense to be an integer. So in this case, it's going to read 1 and say yeah. It's going to read 2, yep. It's going to read the 3, yep. Then it will get space/new_line and now we're done. So we've got 123. So 123 gets stored into num1.

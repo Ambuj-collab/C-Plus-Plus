@@ -1,0 +1,10 @@
+Now, we'll briefly go over the C++ pre-processor and pre-processor directives. 
+
+What is the C++ pre-processor? 
+The C++ preprocessor is a program that processes your source code before the compiler sees it. The C++ pre-processor first strips all the comments from the source file and replaces each comment with a single space. Then it looks for pre-processor directives and executes them. The code processed by the preprocessor is called expanded code and is generally saved with a ".i" file extension.
+
+Pre-processor directive are lines in the source code that begin with a pound or hashtag symbol. In C++, the preprocessor directives are special commands that are used to instruct the preprocessor. It begins with a '#' symbol and tells the preprocessor to modify the source code before compilation. There are different preprocessor directives in C++ for different operations.
+
+The most commonly used pre-processor directive is the #include directive. When the preprocessor sees this directive, it replaces the #include line with the file that it's referring to. Then it recursively processes that file as well. So by the time the compiler sees the source code, all comments are stripped out and all preprocessor directives have been processed and removed. Preprocessor directives have commonly used to conditionally compile code. For example, suppose you only want to compile a portion of your source code if you're on the windows operating system. In this case, you would use a pre-processor directive to check to see if you are on windows and if yes then perhaps includes some windows-specific libraries. If you're not on windows, then maybe you want to include some macOS X libraries or use the #error preprocessor directive to abort the compile with an error message.
+
+One final note that's very important to understand. The C++ preprocessor does not understand C++. Let me say that again, the C++ pre-processor does not understand C++. It simply follows the preprocessor directives and gets the source code ready for the compiler. The compiler is the program that does understand C++.

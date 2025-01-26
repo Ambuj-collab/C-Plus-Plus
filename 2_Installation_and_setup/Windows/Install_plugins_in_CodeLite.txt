@@ -1,0 +1,9 @@
+1) Open CodeLite
+2) Click on Plugins tab > Manage Plugins...
+3) Select the following 2 plugins
+	a) LanguageServerPlugin
+	b) Wizards
+4) Click OK
+5) Restart CodeLite
+
+Now, again if you click on Plugins tab, you will see those plugins. You can change the settings basically of those plugins

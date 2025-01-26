@@ -1,0 +1,13 @@
+Now, we'll briefly go over using c++ namespaces. C++ namespaces can be a little confusing when you first see them. As our c++ programs become more and more complex, our programs become a combination of our own code, the c++ standard libraries and their code, and libraries from third-party developers and their code. So as you can imagine, sooner or later, we're going to run into the situation where company X names something the same as company Y. When we use that name in our program, the c++ compiler doesn't know which one to use. So we have something called the naming conflict. For example, suppose another library that we're using has defined a name called cout. Well, that's a big problem, right. Because now c++ doesn't know which cout to use. C++ allows developers to use namespaces as containers to group their code entities into a namespace scope. That means that I could create a namespace called 'ambuj', and I could define cout within that namespace. Now if a programmer wanted to use my version of cout, all they had to do is say ambuj::cout, that's it. If they wanted to use the one in the standard library, they would just say std::cout. It's as simple as that.
+
+Namespaces are used to reduce the possibility of naming conflicts. The :: operator is called the scope resolution operator. It's used to resolve which name we want to use. However, many programmers find it tedious to type std:: all the time when using cin, cout, endl and so forth. So c++ provides a few mechanisms to help in that regard.
+
+	using namespace std;    --> std is the name of the namespace
+
+This(i.e., 'using namespace') is pretty easy to use. And it's the way I'll do it in this course from this point forward since it reduces code clutter and it's better from a teaching perspective. However, this may not be the best solution for large programs. Using namespace standard(i.e., 'using namespace std') not only brings in cin, cout and endl, it brings in a bunch of other names that are defined in that namespace. So the possibility exists that you may still have a naming conflict. C++ provides another variant of the 'using namespace' directive.
+	
+	using std::cout;
+	using std::cin;
+	using std::endl;
+
+Here, we tell the compiler exactly the names I want to use from a specific namespace. In this case, you can see I'm using three 'using' directives, each qualified for a specific name in a specific namespace. The advantage of this approach is that we can still use cin, cout and endl in our code without the 'using namespace' directive and scope resolution operator(in the actual code) and we're not getting any other names from the c++ standard namespace.

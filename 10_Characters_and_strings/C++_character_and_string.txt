@@ -1,0 +1,39 @@
+Now, we'll talk about characters and strings. As we've already seen, the character type can hold values that represent characters. These values are basically integers that match to a character set like the ASCII character set. And we've also seen that strings are sequences of characters. C++ supports two types of strings, c-style strings and c++ strings. So will first look at the cctype library. This is a library, a very simple but very useful functions that work with characters. For example, we can test characters to see if they're uppercase or lowercase, or numeric, or alphanumeric, or punctuation and more. We can also convert characters between lowercase and uppercase.
+
+Now, we'll talk about the functions that we can use with characters. This cctype library includes very simple and very useful functions that allow the testing of characters for various properties as well as the conversion of characters from upper to lower or lower to uppercase. In order to use these functions, you must include cctype header file. The functions all expect a single character. In case of the testing functions, they evaluate to true or false. And the conversion functions return the converted character.
+
+We'll learn about c-style strings. C-style strings are about as simple as it gets. They're a sequence of characters, stored contiguously in memory. They're implemented as an array of characters, so you can access individual characters using the array subscript syntax(i.e., []) that we've already learned. How do you know where the sequence of characters ends?. C-style strings use a sentinel value that marks the end of the string. The null character(i.e., \0) is used, which is equivalent to the integer zero. So c-style strings are often referred to as zero or null terminated strings. Even though we don't explicitly provide a null character at the end of the string literal, c++ inserts one for us. That's the way the end of string is handled.
+
+Now strlen() function doesn't return an integer. It doesn't really return an unsigned integer. It returns a type called size_t. And I haven't talked about that yet but I'm going to now. size_t really is an unsigned integer. It could be an unsigned long. You really don't know what it is, based on your system, that's the whole point. We really should be using size_t because regardless of what system you're on, this will work. You can be sure it will be unsigned though, right, because it doesn't make sense to have negative sizes/lengths for strings or negative sizes for loop variables and things like that typically.
+
+If you want to read the full line, containing spaces, entered from the user, then use the below code:
+	char input[100];
+	cin.getline(input, sizeof(input));
+	
+getline() method, of cin object, reads the characters until it has read the maximum number of characters(i.e., passed as second argument) or encountered the new line character. So this will stop either if you reach the max or when the user presses enter.
+
+C++ Strings:
+==================
+1)
+	string part1 {"C++"};
+	string sentence;
+	sentence = part1 + " " + " is a powerful language";  // valid
+	
+	// This is because we have two c-style string literals. And you can't concatenate c-style string literals using +.
+	sentence = "C++" + " is powerful";  // invalid
+
+2) 
+	string s1 {"This is a test"};
+	// Substring starting at index 5 and include two characters
+	cout << s1.substr(5,2);  // is
+
+3) getline() function stops reading when it sees the new line. It doesn't include the new line in the string it just discards it.
+
+4) C-style string input with spaces:
+	char input[100];
+	cin.getline(input,sizeof(input));
+   
+   C++ string object input with spaces:
+	string input {};
+	getline(cin, input);
+
