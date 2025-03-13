@@ -1,0 +1,41 @@
+'this' is a reserved keyword that contains the address of the current object. So it's a pointer to the object that's currently being used by the class member methods. The 'this' keyword can only be used within the scope of the class. In many other object-oriented programming languages, we use the word 'self' instead of this. But in c++, we use the keyword 'this'. All member access is done via the 'this' pointer. However, c++ allows you to use member names directly. But behind the scenes, it's actually using 'this' pointer. This can be used by the programmer, and in many cases, we must use it. We can use it to explicitly access data members and methods. We can also use it to determine if two objects are the same. We'll use 'this' in the next section when we overload the assignment operator to determine if we're assigning to ourselves. Of course, since 'this' points to the current object, if you de-reference it, you'll follow the pointer and work with the current object.
+
+const with classes:
+=====================
+We'll learn a little bit more about the const qualifier in the context of class methods. We've already learned that we can create const variables, which can't be changed. And we've also seen how we can pass references and pointers into functions as const, and they can't be modified while in the function. Well, in this video, we'll learn how to create const objects and see what happens when we pass constant objects to methods that don't expect the const. Using const correctly in parameters as well as method declarations is the basis for const correctness in a program.
+
+In the example shown below, we're creating a const object named 'villain'. Now once 'villain' is created, we can't change any of its attributes, that's the whole idea with it being const.
+	const Player villain {"Villain", 100, 55};
+
+So what happens if we call member methods on a const object. Let's look at calling a setter method that changes the object. Obviously, this can't be allowed since the object is declared as const. And in fact, this produces a compiler error. The compiler complains that you're passing a const object as 'this' to a method that could change it. 
+	villain.set_name("Nice guy"); // ERROR
+
+But what about the output/getter statement. In this case, I'm not modifying the const object. I'm simply getting a copy of its name for display. Well, this won't compile either. In fact you get the same error that you got when you called set_name().
+	std::cout << villain.get_name() << std::endl; // ERROR
+
+So what's up. Why is that? Well, the compiler assumes that the get_name() function could potentially change the object, so it gives an error. But we need a solution to this problem since we would like to call the getter methods and other methods that are public that don't modify the object. Below is another example.
+	const Player villain {"Villain", 100, 55};
+	
+	void display_player_name(const Player &p) {
+	cout << p.get_name() << endl;  // ERROR
+	}
+	
+	display_player_name(villain); 
+
+Again, we defined the 'villain' object and it's a constant, so it can't be changed. Now we have a display_player_name() function that expects a reference to a Player object. It expects 'p', which is a reference to a const/non-const Player object. Again, we get a compiler error. Here the problem is that when we call p.get_name() in the display_player_name() function, 'this' pointer isn't expecting a const object, so get_name() could potentially change the object. The compiler is being very careful not to allow a const object to lose its constness. So what's the solution? The solution is actually very simple. We need to tell the compiler that specific methods will not modify the object. And all we have to do is put the const modifier before the semicolon in the method prototype as shown below.
+	class Player {
+	private:
+		. . .
+	public:
+		std::string get_name() const;
+		. . .
+	};
+
+Now the compiler will not only allow this method to be called on const objects, it will also produce a compiler error if you try to modify any of the object attributes in this method. The idea of class methods having const qualifiers is part of what's referred to as const correctness. Const correctness can get pretty complicated, but this video serves to give you a basic idea of what it is and how important it is.
+	const Player villain {"Villain", 100, 55};
+	villain.set_name("Nice guy"); // ERROR
+	std::cout << villain.get_name() << std::endl; // OK
+
+Now you can see that the call to get_name() function works just fine, but the call to set_name() is still not allowed since set_name() is not a const function. Remember, since you're telling the compiler that get_name() is a const member function. Then if you write code in the body of get_name() method that modifies the object, you'll get a compiler error. That's const correctness in action.
+
+So this is const correctness. It can get pretty complicated when you're passing things all over the place as const here, non-const here and so forth. But the rule of thumb is all your getters should be const. Basically, any method that you have in your class that doesn't modify the object should be const.

@@ -1,0 +1,160 @@
+So we've learned how to overload the copy and move assignment operators. Now let's look at some of the other operators that c++ lets us overload. C++ allows us to overload operators as member methods or as global non-member functions. In this video, we'll use member methods to overload operators. And in the next video, we'll overload the same operators using global functions. So let's start with unary operators. Unary operators work on one operand. Those operators include the increment(i.e., ++), decrement(i.e., --), unary negation(i.e., -) and the bang or not operator(i.e., !). Notice the basic method declaration shown below.
+	ReturnType Type::operatorOp();
+
+In the case that we have to return a new object from the method, we'll return the new object by value. Also notice that member methods of overloaded unary operators have an empty parameter list. This is because the object we're working with is referred to by the 'this' pointer. So below you can see the method prototypes for the overloaded unary operators if we wanted them to work with our hypothetical Number class. Let's see the Number class definition as shown below:
+	class Number {
+	private:
+		int i;
+	 
+	public:
+		// Parameterised constructor
+		Number(int i = 0)
+		{
+			this->i = i;
+		}
+	 
+		// Overloading the prefix operator
+		Number& operator++()
+		{
+			++i;
+			// returned value should be a reference to *this
+			return *this;
+		}
+	 
+		// Function to display the value of i
+		void display()
+		{
+			cout << "i = " << i << endl;
+		}
+	};
+	
+	
+	Number Number::operator-() const;
+	Number Number::operator++();		// pre-increment
+	Number Number::operator++(int);	// post-increment
+	bool Number::operator!() const;
+
+Also notice that we can overload both the pre and post increment and decrement operators, as shown above. C++ simply provides an int, that isn't used, in the parameters for the post increment. 'int' in the overloaded post-increment method parameter distinguishes with the overloaded pre-increment method parameter. 
+	Number n1 {100};
+	Number n2 = -n1;	// n1.operator-()
+	n2 = ++n1;			// n1.operator++()
+	n2 = n1++;			// n1.operator++(int)
+
+Above, you can see how we can use the unary operators as we do with the built-in types and how methods are being called in the comment section. 
+
+Suppose we wanted to overload the unary minus/negation operator to work with our Mystring class, and we want to make the string lower case whenever it's used. Let's see the Mystring class definition as shown below:
+	class Mystring
+	{
+	private:
+		char *str;      // pointer to a char[] that hold a C-style string
+	public:
+		Mystring();                                           // No-args constructor
+		Mystring(const char *s);                              // Overloaded constructor
+		Mystring(const Mystring &source);                     // Copy constructor
+		Mystring(Mystring &&source);                          // Move constructiror
+		~Mystring();                                          // Destructor
+		
+		Mystring &operator=(const Mystring &rhs);     // Overloaded copy assignment operator
+		Mystring &operator=(Mystring &&rhs);          // Overloaded move assignment operator
+
+		Mystring operator-() const;                             // make lowercase
+		Mystring operator+(const Mystring &rhs) const;          // concatenate
+		bool operator==(const Mystring &rhs) const;				// Overloaded equality operator
+		
+		void display() const;
+
+		int get_length() const;                                        // getters
+		const char *get_str() const;
+	};
+	
+	
+	Mystring larry1{"LARRY"};
+	Mystring larry2;
+	
+	larry1.display();	// LARRY
+
+	larry2 = -larry1;	// larry1.operator-()
+
+	larry1.display() ;	// LARRY
+	larry2.display() ;	// larry
+
+So we can create a Mystring object named 'larry1' with the initializer string uppercase "LARRY", as shown above. Then we can use the overloaded unary minus operator on 'larry1' and store the result in 'larry2'. Now 'larry1' will still contain the uppercase "LARRY" string, but 'larry2' will contain the lowercase "larry" string. This is a simple example of overloaded unary minus/negation operator using member methods, however, the question is whether this makes sense. We're programmers, we can make anything happen through code, but, does it make sense for the unary minus operator to make the string lowercase? It depends on the context of the application and the design. Personally, I would prefer a method named lowercase() or toLowercase(), since that's very explicit. But this might make sense in another design.
+	Mystring Mystring::operator-() const {
+		char *buff = new char[std::strlen(str) + 1];
+		std::strcpy(buff, str);
+		for(size_t i=0; i<std::strlen(buff); i++)
+			buff[i] = std::tolower(buff[i]);
+		Mystring temp {buff};
+		delete [] buff;
+		return temp;
+	}
+
+Let's see how the code might look. Above is the code for overloading the unary minus operator to make a string lowercase. Notice the method header. We're returning a new object that will be the lowercase copy of the existing object. So, we're overloading the operator minus. We expect no parameters to this method and it's a const method since we don't want to modify the current object. We want to create a new object based on it(i.e., current object). So the first thing we are doing is allocate space for an area in memory on the heap where we want to store the lowercase copy of the current object string. Then we use the std::strcpy() function to copy the string over. Then we simply loop through the characters in the copied string and convert each character to its lowercase equivalent, using the character function std::tolower() available in the cctype.h header file. So, we need to add '#include <cctype>'. Once we have the 'buff' lowercased string, then we construct a temporary Mystring object using this lowercased string as the initializer. Finally, we delete the 'buff' we created in this method[i.e., operator-()], so that we don't leak memory and then we return the newly created lowercased Mystring object. We could certainly write more optimized code here, but I wrote this method to show each step explicitly. So that's the general pattern for overloading a unary operator using a member method.
+
+Now let's see how we can implement some binary operators also using member methods. As we know, binary operators are applied to two operands. These operators include addition, multiplication, division the equality operator(i.e., ==) and many more. 
+	ReturnType Type::operatorOp(const Type &rhs);	// Syntax
+	
+	Number Number::operator+(const Number &rhs) const;
+	Number Number::operator-(const Number &rhs) const;
+	bool Number::operator==(const Number &rhs) const;
+	bool Number::operator<(const Number &rhs) const;
+
+The pattern for overloading these operators is very similar to the way we overloaded unary operators, except that now we have a single parameter in the method parameter list. I've named this parameter as 'rhs', which stands for right-hand side. That way it's very clear that 'rhs' refers to the object on the right-hand side of the operator and the 'this' pointer points to the object on the left-hand side of the operator. Notice that the overloaded addition and subtraction operators return the newly created sum or difference objects by value. Also notice that the equality operator returns boolean value which makes sense since they're comparing things.
+	Number n1 {100}, n2 {200};
+	Number n3 = n1 + n2;		// n1.operator+(n2)
+	n3 = n1 - n2;				// n1.operator-(n2)
+	if (n1 == n2)	...			// n1.operator == (n2)
+
+You can see above how these overloaded binary operators might be used in our hypothetical Number class.
+	bool Mystring::operator==(const Mystring &rhs) const {
+		if (std::strcmp(str, rhs.str) == 0)
+			return true;
+		else
+			return false;
+	}
+
+	// if (s1 == s2)	// s1 and s2 are Mystring objects
+
+Now let's see how we can implement the equality operator in the Mystring class. The equality operator that allows us to compare two objects. In the case of Mystring objects, we want to compare the strings to see if they're the same. We don't want to compare the pointers. Instead, we want to compare the strings that the pointers point to. Rather than write all the code ourselves, we can use the std::strcmp() function available in the cstring.h header file, which compares c-style strings exactly as we need. When we call that function[i.e., std::strcmp()] with two c-style strings, it will return 0 if the strings are equal. So this method[i.e., std::strcmp()] becomes almost trivial to implement. We compare 'str' from 'this' object to 'str' from the right-hand side object. And if the result is 0, we return true, otherwise we return false. That's it. Now we can write code like if(s1 == s2) ... to compare two Mystring objects for equality.
+	class Player
+	{
+		private:
+			std::string name;
+			int health;
+			int xp;
+		public:
+			// Overloaded Constructors
+			Player();
+			Player(std::string name_val);
+			Player(std::string name_val, int health_val, int xp_val);
+	};
+	
+What if we wanted to write an overloaded equality operator for the Player class, as shown above. Well, we'd have to decide what we want to compare. Are we comparing the 'name' attribute of two objects or the 'health' or the 'xp' or everything. This would be an important decision and the programmers using the Player class would have to be clear as to what's being compared so that they can use it correctly.
+
+Now let's wrap up by overloading the addition operator for the Mystring class. Suppose we wanted to overload the binary plus operator for the Mystring class so that it concatenates the strings from the left-hand side and right hand-side objects into a new object. Then we could use this as in the below example code.
+	Mystring larry{"Larry"};
+	Mystring moe{"Moe"};
+	Mystring stooges{" is one of the three stooges"};
+
+	Mystring result = larry + stooges;	 // larry.operator+(stooges) ;
+
+	result = moe + " is also a stooge";		// moe.operator+("is also a stooge");
+
+	result = "Moe" + stooges;	// "Moe".operator+(stooges) --> ERROR
+
+First, we can create Mystring objects 'larry', 'moe' and 'stooges'. Then we can write a statement like 'larry + stooges', which will concatenate the string in 'larry' and the string in 'stooges' to create a new string i.e., Larry is one of the three stooges. Notice that we can also use c-style strings on the right-hand side. This is because we have a Mystring constructor that can construct Mystring objects from a c-style string. The only limitation to overloading operators as member functions is that the object on the left-hand side operand of the + operator must be an object of the class you're using. For example, the last statement above won't compile since the left-hand side operand of the + operator is not a Mystring object. We can get this to work in the next video when we overload operators as non-member functions.
+	Mystring Mystring::operator+(const Mystring &rhs) const {
+		size_t buff_size = std::strlen(str) + std::strlen(rhs.str) + 1;
+		char *buff = new char[buff_size];
+		
+		std::strcpy(buff, str);
+		std::strcat(buff, rhs.str);
+
+		Mystring temp{buff};
+		delete [] buff;
+		return temp;
+	}
+
+So let's take a look at the code for this method above. It's probably exactly as you would expect. We evaluate a character buffer large enough for both of the strings plus one(i.e., for the string terminator). Then we allocate this buffer on the heap. First, we copy over the left side string(i.e., pointed by 'this' pointer) using std::strcpy, and then we concatenate the right side string(i.e., referenced by 'rhs' method parameter) using std::strcat. Then we create the new object that will contain the concatenated string using the buffer(i.e., 'buff' variable) as the initializer. And then finally, we de-allocate the local buffer area so that we don't leak memory. And then, we return the newly created object by value. You can see that first this looks complicated, but the more you do it, patterns evolve that are very very similar.
+
+It's important to understand that when we're overloading operators as member methods, unary operators take no parameters, binary operators take one parameter.

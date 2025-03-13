@@ -1,0 +1,121 @@
+Shallow copy:
+===============
+We'll look at the difference between a shallow copy and a deep copy in the context of the copy constructor. First, we'll assume that the object we're copying has a raw pointer. When the object is constructed, we'll likely allocate storage for the data that that pointer is pointing to. And then when we're done with the copy, we'll release the memory as per best practices. But what happens in the copy constructor? We can do a shallow copy or a deep copy. Let's see what that means. Let's first look at doing a shallow copy and the problems we can run into. A shallow copy is the default behavior provided by the compiler generated copy constructor. It basically does member-wise copying of all the object attributes. So you end up with the newly created object and the object being copied, both pointing to the same area of storage in the heap. So what's the problem? Well, the problem comes into play when one of those objects is destroyed and its destructor is called. When this happens, the object's destructor releases the memory allocated on the heap as it should. However, the other object is still pointing to this released area and thinks the area is still valid. This could lead to subtle errors. The best thing that can happen is that the program crashes while in development, so that you can fix the error. But we'll learn how to do a deep copy and avoid the error completely.
+	class Shallow {
+	private:
+		int *data;
+	public:
+		void set_data_value(int d) { *data = d; }
+		int get_data_value() { return *data; }
+		// Constructor
+		Shallow(int d);
+		// Copy Constructor
+		Shallow(const Shallow &source);
+		// Destructor
+		~Shallow();
+	};	
+
+But first, let's walk through an example that has a class with a pointer attribute, that does a shallow copy, so we can really understand the problem. Above is the class we'll use in this example. The class is called Shallow and it has a single data attribute called 'data' and that's a pointer to a single integer. We could have created a pointer to an array of integers, a pointer to a some sort of object, it doesn't really matter. This class is about as simple an example as we could write that demonstrates the problem with a shallow copy. But any class that has a raw pointer as a data member will have the same issues. This class has a constructor that expects an integer, a copy constructor and a destructor. Let's see how these are implemented. Here's the code for the constructor.
+	Shallow::Shallow(int d) {
+		data = new int;
+		*data = d;
+	}
+
+Notice that the constructor allocates storage for the integer, and stores the passed in integer 'd' where that 'data' pointer is pointing. Since we allocated this storage dynamically, then we must be sure to release it in the destructor. Let's do that now. Here's the destructor. So, what did the destructor do. It freed up this area in memory right here. So as far as the c++ runtime system is concerned, this is no longer valid memory, right. We just deleted it.
+	Shallow::~Shallow() {
+		delete data;
+		cout << "Destructor freeing data" << endl;
+	}
+
+It simply frees the storage that was allocated by the constructor as it should. It also displays a message to the console. Whenever we allocate storage in the constructor, the best practice is to release that storage in the destructor. So now let's implement the copy constructor. Here's the copy constructor.
+	Shallow::Shallow(const Shallow &source) 
+		: data(source.data) {
+			cout << "Copy constructor  - shallow copy" << endl;
+	}
+
+This copy constructor is user defined but it provides the same semantics as the default compiler generated copy constructor if we hadn't provided this one. Notice that, in the initializer list, we simply copy the pointer value. It's copying the pointer not what it's pointing to. This is member-wise copy. Now we have a problem. In this case, the source object and the newly created object, both point to the same area in heap that was allocated for the 'data'. But why is this a problem? Well, the problem comes into play when we make a copy of a shallow object using the copy constructor that's doing a shallow copy. Suppose we have a function display_shallow() that expects a shallow object by copy. So we've got a real simple function right here called display_shallow, which we pass in a Shallow object by value. So we're gonna make a copy of it.
+	void display_shallow(Shallow s) {
+		cout << s.get_data_value() << endl;
+	}
+
+We make the copy with the copy constructor as usual, but when that local object 's'(i.e., inside display_shallow function) goes out of scope, its destructor is called, and the destructor releases the storage in the heap that 's' is pointing to. You see the problem now. The object that was copied into this function still points to this now released storage, but it thinks that the storage is valid. So all kinds of bad things can happen.
+	int main() {
+		
+		Shallow obj1 {100};
+		display_shallow(obj1);
+		
+		Shallow obj2 {obj1};
+		obj2.set_data_value(1000);
+		
+		return 0;
+	}
+
+Now above is a sample main function. We create obj1 as a Shallow object. obj1 will be created and an integer memory will be allocated on the heap and 100 stored in it. Now we call display_shallow function, and a copy of obj1 will be created inside that function. And when that function(i.e., display_shallow) is done, the copy of obj1 will be destroyed. Since obj1 and the copy that was just destroyed pointed to the same memory area, obj1 now points to invalid storage. If we try to access that storage from obj1, our program could crash. Also when the destructor for obj1 eventually gets called, it will try to release memory that's no longer valid and will probably crash.
+
+This program does a shallow copy in the copy constructor.
+
+So the point of this video is to try to understand exactly why this program is crashing, why we need a deep copy and why we've got to be really careful when we use raw pointers.
+
+
+Deep copy:
+============
+Now that we know what shallow copying is in the context of the copy constructor, let's look at deep copying. With a deep copy, we don't just simply copy the pointer. Instead, we copy the data pointed to by the pointer. This usually means that we have to allocate storage for the copied data and then perform the copy. With a deep copy, each object will have a pointer to unique storage in the heap and both areas will contain the same data. You always want to use a copy constructor that does a deep copy when you have raw c++ pointers.
+	class Deep {
+	private:
+		int *data;
+	public:
+		void set_data_value(int d) { *data = d; }
+		int get_data_value() { return *data; }
+		// Constructor
+		Deep(int d);
+		// Copy Constructor
+		Deep(const Deep &source);
+		// Destructor
+		~Deep();
+	};
+
+Let's look at the class that we'll use in this example. It's exactly the class we used for the shallow copy except that I named this class 'Deep' to be clear. We have a raw c++ pointer that points to a single integer, and above is the class we'll use. This class has a constructor that expects an integer, a copy constructor and a destructor as before. And let's see how we implemented these methods. Here's the constructor, and you can see that this code is exactly the same as we implemented in Shallow. After all, we want to create those objects the same way.
+	Deep::Deep(int d) {
+		data = new int;
+		*data = d;
+	}
+
+The constructor allocates storage for the integer and then stores the passed in integer 'd' into where that 'data' pointer is pointing. Since we allocated the storage dynamically, then we have to release it in the destructor, so we'll do that now. Here's the code for the destructor.
+	Deep::~Deep() {
+		delete data;
+		cout << "Destructor freeing data" << endl;
+	}
+
+Again, it frees the data that was allocated by the constructor and displays a message to the console. Now this is where the change comes in. It's with the copy constructor. Let's see the difference. So here's the copy constructor. And this is where things change from the copy constructor we saw previously that does a shallow copy.
+	Deep::Deep(const Deep &source)
+	{
+		data = new int; // allocate storage
+		*data = *source.data;
+		cout << "Copy constructor - deep" << endl;
+	}
+
+Here we don't simply copy the pointer. Instead, we allocate storage for the copy of what we're pointing to and then copy the data itself over. So you can see we're creating a new integer(i.e., allocating space for int) and then we're copying what the source 'data' pointer is pointing to, which is an integer into our newly created area on the heap, and we're also displaying a message. Now we have an exact unique copy of the original heap storage in each object.
+	Deep::Deep(const Deep &source)
+		: Deep {*source.data} {
+		cout << "Copy constructor  - deep copy" << endl;
+	}
+	
+Since we can also delegate object construction from a copy constructor to another constructor within the same class, we could do that as above. Notice that we're delegating to the constructor that expects an integer. And the integer we're passing in, is the one pointed to by 'data' pointer of 'source' local variable. Now we've made a deep copy of that data pointer. And both source and the newly created object each have an exact unique copy of the original heap storage.
+	void display_deep(Deep s) {
+		cout << s.get_data_value() << endl;
+	}
+
+So now we'll have that function display_deep() that expects a Deep object by value. We make a copy, i.e., s, and use it. And then when 's' goes out of scope, we call the destructor which frees up the allocated storage. In this case, there is no problem since the allocated storage pointed to by the 'data' pointer is unique.
+	int main() {
+		
+		Deep obj1 {100};
+		display_deep(obj1);
+		
+		Deep obj2 {obj1};
+		
+		obj2.set_data_value(1000);
+	  
+		return 0;
+	}
+
+And finally, above is the main function same as we used for the shallow example except we're using it now with the deep example. This code will now run correctly. There won't be any crashes and no problems because the copy constructor is doing a deep copy, and we're responsibly handling memory.

@@ -1,0 +1,23 @@
+We'll discuss another way to create objects in c++ using a 'struct' or structure. The 'struct' comes from the c programming language. In c, we create structs as a container for data, much like a record in many other programming languages. C++ also supports 'struct' since it has to be compatible with c. However, it adds the ability to treat structs very much like classes. Everything you can do with classes, you can do with structs. The only difference is that the members of a struct are public by default, whereas, the members of a class are private by default.
+	class Person {
+		std::string name;
+		std::string get_name();
+	};
+	
+	Person p;
+	p.name = "Frank"; // compiler error - private
+	std::cout << p.get_name(); // compiler error - private
+	
+Here's a simple class declaration for a Person class. It has a string attribute called name and a method called get_name() that returns that name. By default, class members are private. So if we create a Person object p and try to access name or call get_name(), the compiler will give us a compiler error saying that we don't have access to those private elements.
+	struct Person {
+		std::string name;
+		std::string get_name(); // Why if name is public?
+	};
+	
+	Person p;
+	p.name = "Frank"; // OK - public
+	std::cout << p.get_name(); // OK - public
+
+Now let's see the same as a 'struct'. Here we have Person declared as a struct. We have the same attribute and the same member method. But now when we create the Person object p and try to access its attribute or member function, the compiler is okay with it. That's because the default access for a struct is public. That's the only difference between structs and classes in c++.
+
+But there's a few general guidelines that you can use to determine if you need a structure or a class. It would be appropriate to use a 'struct' when you have passive data. So the 'struct' would act very much like a 'struct' in c. It simply holds data and that data is public. And since the data is passive, you really don't need to create any methods in the struct. As, for a class, we've already seen many examples. If your objects are active or they have complex behavior, then you should use a class and implement getters and setters and member methods as needed. These guidelines are very general. But remember, other c++ programmers will likely be modifying and extending your code. So don't use c++ in a way that's very different from what c++ programmers expect. For example, don't use a struct and then make everything private in the struct, so it behaves like a class, just use a class instead.

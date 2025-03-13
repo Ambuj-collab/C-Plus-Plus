@@ -1,0 +1,126 @@
+Now, we'll learn about how to implement member methods in our c++ classes. You'll be glad to hear that class methods are implemented in a manner very similar to the way we implemented functions. But I'd say that they're generally less complex. This is because member methods have access to the class's member attributes, so we don't have to pass so many arguments around. C++ gives you many options regarding where to write code for member methods. You can define the member methods right inside the class declaration. If you do this, then the methods become implicitly in-line. While this is okay for small and relatively simple methods, we tend to implement larger and more complex methods outside of the class declaration. In order to do so, we need to tell the compiler that we're implementing a method that belongs to a specific class. So we use the class name followed by the scope resolution operator(i.e., ::) and then the method name. This unambiguously tells the compiler that you're implementing a method for a specific class. In c++, it's also very common to separate a class's specification from its implementation. This makes the class much easier to manage. We usually create a header or include file that has a .h or .hpp extension for the class specification and then a separate .cpp file for the class implementation.
+
+As our programs get larger, we really want to separate class specification and class implementation into different files. Let's see an example of how we can do that. In this(i.e., below) example, we create a file named Account.h. This is an includer header file that will #include in our .cpp files whenever we need to use the Account class. Notice that in this file, we provide the specification for the Account class. Before we can use or #include this Account.h header file, we need to take care of a potential problem. If this file is included by more than one .cpp file, then the compiler will see the declaration for the Account class more than once and give us an error about duplicate declarations. 
+	// Account.h
+	class Account {
+	private:
+		// attributes
+		double balance;
+		
+	public:
+		// methods
+		// declared inline
+		void set_balance(double bal) { balance = bal; }
+		double get_balance() { return balance; }
+	};	
+
+In order to solve this, we can use what's called an include guard that ensures that the compiler will process this file only once, no matter how many times it's included. An include guard is just a series of pre-processor directives that guarantees the file will only be included once. The way it works is we wrap up our entire class declaration in this include guard. The first line is #ifndef(i.e., if not defined) _ACCOUNT_H_, all in uppercase. This checks to see if the preprocessor has a symbol named _ACCOUNT_H_. This simple name(i.e., _ACCOUNT_H_) can be anything you want, but best practice is to use some sort of combination of the file name in uppercase with preceding and ending underscores. Any name is fine as long as it's unique in the program. If the preprocessor has that name defined, then it skips the entire file and goes to the #endif at the end. In other words, it doesn't process the file since it's already seen it because the symbol(i.e., _ACCOUNT_H_) has been defined. If the symbol has not been defined, then the symbol is set(i.e., #define _ACCOUNT_H_) and the file is processed as usual.
+	// Account.h
+	#ifndef _ACCOUNT_H_
+	#define _ACCOUNT_H_
+
+	class Account {
+	private:
+		// attributes
+		double balance;
+		
+	public:
+		// methods
+		// declared inline
+		void set_balance(double bal) { balance = bal; }
+		double get_balance() { return balance; }
+	};
+
+	#endif 		// _ACCOUNT_H_
+	
+So now this is what the Account.h file typically contains. You can see the include guard wrapping the class declaration.
+
+Many compilers also support the '#pragma once' preprocessor directive. The effect of this directive is the same as the include guard, while many compilers support this directive, some don't. So check your compiler documentation to be sure.
+	// Account.h
+	#pragma once
+	class Account {
+	private:
+		// attributes
+		double balance;
+		
+	public:
+		// methods
+		// declared inline
+		void set_balance(double bal) { balance = bal; }
+		double get_balance() { return balance; }
+	};
+
+Now we can provide the implementation for the Account class in a separate file named Account.cpp. Let's take a look at that. This(i.e., below) is the source code for the Account.cpp file. Notice that we include Account.h and it's in double quotes. Up to this point, our includes have used angle brackets with no extensions. There's an important difference between the two forms of include. Include with angle brackets, as in #include <iostream>, is used to include system's header files and the compiler knows where these are located. Includes with double quotes tell the compiler to include header files that are local to this project, the compiler also knows where those are. Notice that this file(i.e., Account.cpp) implements the two methods declared in the Account.h header file. Now our Account class is complete, the specification is in Account.h and the implementation is in Account.cpp.
+	// Account.cpp
+	#include "Account.h"
+
+	void Account::set_balance(double bal) {
+		balance = bal;
+	}
+
+	double Account::get_balance() {
+		return balance;
+	}
+
+How do we use an Account class in our main.cpp file though. Let's see below.
+	#include <iostream>
+	#include "Account.h"
+
+	int main() {
+		Account frank_account;
+		frank_account.set_balance(1000.00);
+		double bal = frank_account.get_balance();
+		
+		std::cout << bal << std::endl;  // 1000
+		return 0;
+	}
+
+Notice how we include iostream as well as Account.h header files. It's important that you always include .h files, never include .cpp files. When the program is compiled, both the main.cpp and the Account.cpp files are compiled and then linked to produce the executable.
+
+
+Q) Just a question about the Account.h, how does it know that its functions implementations are in Account.cpp? In Account.h you didn't include the file ( Account.cpp ) and not even in the main.cpp.
+Ans) Account.h declares the specification for the Account class. It declares the instance variables and the method prototypes for the class.
+
+Now any other part of the program that needs to use Account class can #include "Account.h" and the compiler will be able to type check everything and make sure the class is being used correctly. The Account.h file has no idea about Account.cpp.
+
+Account.cpp is the one that knows about Account.h. Account.cpp includes Account.h since it implements the spec that we provided in Account.h
+
+So, how does all this come together?. Well, when we compile our program, we compile BOTH main.cpp and Account.cpp (and any other .cpp files we might have). Then the linker takes care of linking all the pieces together.
+
+A VERY COMMON MISTAKE by beginners is to ONLY compile main.cpp and then when they get linker errors, then try to resolve the linker errors by #including "Account.cpp"  -- this may work in the short term but will cause issues as the program grows.
+
+You should NEVER #include .cpp flies.
+
+The IDE takes care of compiling BOTH main.cpp and Account.cpp since when you add Account.cpp file to the project, it automatically adds it to the build. 
+
+Q) When we say Account::set_name("Frank"). The set_name was the name of the function and Account is the class. So when we say std::string, is it that string is the name of the function and std is the class.
+Ans) In the case of std::string, std is the name of the namespace and string is the name of the class.
+We can create our own namespaces:
+	namespace frank {
+	   class Account {
+	   };
+	   // Whatever else we want
+	}
+Then we would have:
+	frank::Account::set_name
+		or
+	using namespace frank;
+	Account::set_name
+
+The scope resolution operator :: resolves scope at many levels.
+
+Namespaces allow us to define a name that our code belongs to. C++ defines the std (standard) namespace.
+I could define an Account class in the Frank namespace and this would prevent name clashes with other Account classes that I might be using.
+
+Q) What are the benefits of putting the class in seperate files when the program runs fine in a single .cpp?
+Ans) Programs in production can get very large. We want to break the program up into logical units. This allows quicker compilations as well as much simpler management of multiple programmers working on multiple files.
+
+Q) In the example above, you included the Account.h file in main.cpp as well as Account.cpp . Isnt it sufficient to include Account.h file only in one of the cpp files because the linker is going to link these files to give the final result? So if its present in any one of the files then shouldnt it work just fine?
+Ans) C++ supports independent compilation of source files. So, when we have a program that has many .cpp files, we really don't want to compile them all every time we build. Instead, we only want to compile the ones that have changed since the last build.
+
+By including the header files needed by each .cpp file in that .cpp file, we can use independent compilation to really speed up our builds.
+
+Q) Sorry if this is a bit out of context but I'm finding it very difficult understanding the need for both the .h and .cpp file for creating a class. I learned Java first, where class definition and implementation is done all in the class file. Is it possible to do the same in C++?
+Ans) C++ gets this from C and the idea is to separate the program declaration and definition into two files and was done to speed up compilation as well as to not expose implementation details when using libraries.
+
+The idea is to always include .h files and never include .cpp files and let the linker worry about putting everything together.

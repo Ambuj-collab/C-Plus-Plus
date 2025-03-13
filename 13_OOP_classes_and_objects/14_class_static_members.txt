@@ -1,0 +1,42 @@
+We'll learn about static class members and how to use them in c++. In a c++ class, we can have both static data and function members. When we declare class data members as static, we're telling the c++ compiler that these data members belong to the class, not to any specific object. So they're extremely useful to create class-wide information. For example, suppose we wanted to know how many Player objects we have active in our application at any point in time. We could create a global variable and then increment it and decrement it in the code whenever we create an object or delete an object. This is really hard to do though since we really can't be sure when constructors are being called and when destructors are being called. So a better solution is to create a static variable, that's part of the Player class, and then we can manipulate that variable directly within the Player class. And then whenever we need to know how many Player objects there are, we can simply ask the Player class. We don't even need any objects. In fact, if the player count is 0, this means that there are no active Player objects at all.
+
+So how could we modify our Player class to support this. Let's start with the Player class. We'll create a Player.h file with the class specification and a Player.cpp file with the class definition. 
+	class Player {
+	private:
+		static int num_players;
+	public:
+		static int get_num_players();
+	. . .
+	};
+
+Now we need to add a static data member to the class. We can do this very easily by adding a private static int named num_players. We'll initialize this to 0 a little bit later since we can't initialize it right here. We also would need to declare a static class function that returns an integer. It will return the static integer(i.e., num_players variable) that we just declared. Now, let's head over to Player.cpp file. This is where we want to initialize the static integer num_players to 0. So that's initialized. It only happens once and the best place to do that is in the .cpp file for the class that you're defining.
+	int Player::num_players = 0;
+
+Notice that the syntax, as shown above, might look a little strange. This is where(i.e., Player.cpp) you define that variable and assign it to 0 in this case. This must happen exactly once and it typically happens in the .cpp file for the class. 
+	int Player::get_num_players() {
+		return num_players;
+	}
+
+Finally, we implement the static function get_num_players(). Since this function is static, it only has access to static data members. It does not have access to non-static class data members. So in this function, we simply return num_players variable. There's only one part left to do. We need to increment and decrement the number of players whenever we create and destroy Player objects. The best place to increment the player count is in the constructor.
+	Player::Player(std::string name_val, int health_val, int xp_val)
+		: name{name_val}, health{health_val}, xp{xp_val} {
+			++num_players;
+	}
+
+In this case, we simply increment num_players by 1. Be careful though if you have many overloaded constructors, since you might have to increment num_players in more than one place. Basically, anywhere you create an object. We only have one constructor in the Player class and we're delegating to it from our copy constructor, so this is the only place we want to increment num_players in this example. 
+	Player::~Player() {
+		--num_players;
+	}
+
+Our original Player class didn't have a destructor. It used the compiler provided default destructor since it was all we needed. However, now we need to define our own destructor and decrement the number of players count when the object is destroyed. That's it. We're all set.
+	void display_active_players() {
+		cout << "Active players: " << Player::get_num_players() << endl;
+	}
+	int main() {
+		display_active_players();
+		Player obj1 {"Frank"};
+		display_active_players();
+		. . .
+	}
+
+Now we can use our Player class and simply call Player::get_num_players(), and it will return the number of active Player objects. I created a simple helper function named display_active_players(). And anytime, I need to display the number of active players, I simply call it. Now look at the main() function. The first statement is display_active_players(), and it will display 0. As we add and remove Player objects, we'll call display_active_players() function and it will display the current number of active Player objects.

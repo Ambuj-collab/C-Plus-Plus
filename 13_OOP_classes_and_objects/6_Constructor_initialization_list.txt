@@ -1,0 +1,36 @@
+We'll learn about constructor initialization lists, which are very useful for efficiently initializing our object's data members. So far we've written our codes so that we initialize our data member values in the constructor body by assigning values to them.
+	Player::Player() {
+		name = "None"; // assignment not initialization
+		health = 0;
+		xp = 0;
+	}
+
+While this works, it, technically, isn't initialization because by the time the constructor body is executed, these member attributes have already been created. So we're really just assigning values to already created attributes. What we really want to do is have the member data values initialized to our values before the constructor body executes. This is much more efficient since it's true initialization. C++ allows us to do this using constructor initialization lists, which is basically just a list of initializers immediately following the constructor parameter list.
+	class Player
+	{
+		private:
+			std::string name;
+			int health;
+			int xp;
+		public:
+			// Overloaded Constructors
+			Player();
+			Player(std::string name_val);
+			Player(std::string name_val, int health_val, int xp_val);
+	};
+
+Here we have the same Player class that we've been using in previous examples. It has three overloaded constructors. And if you recall from the previous videos, we implemented them using assignment statements in the constructor body.
+	Player::Player() {
+		name = "None"; // assignment not initialization
+		health = 0;
+		xp = 0;
+	}
+
+You can see above, how we previously implemented the no args constructor. In the body of the constructor, we use three assignment statements to set the attributes to the values we want. While this works, it can be inefficient in many cases. For example, by the time that we get to the statement name = "None";, the name string object has already been constructed and initialized to an empty string. So we're really just assigning a new string to it, in this case(i.e., above implemented constructor), to an existing object. That's very different from initialization. What we really want is to initialize the data members to our data values as they're created. That's what constructor initialization lists allow us to do.
+
+The below section shows how we could implement the same constructor in a more efficient way. Notice that immediately after the parameter list, we provide a colon followed by a list of initializers.
+	Player::Player()
+		: name{"None"}, health{0}, xp{0} {
+	}
+
+In this case, we're telling the c++ compiler to initialize name to 'None' health and xp to 0. This happens before the body of the constructor is ever executed. One thing to keep in mind, the order in which the members are initialized is not necessarily the order we provide in the initialization list. The data members will be initialized in the order that they were declared in the class declaration. Notice that there's no code in the constructor body. We can still write any code we want in the constructor body. But now we can be sure that our data members have been initialized to our own values before any code in the constructor body is executed.

@@ -1,0 +1,53 @@
+We'll learn about friends of a class in c++. Friends have always been a controversial topic in c++. The controversy is about encapsulation and whether friends violate encapsulation or enhance it. You can decide where you are on this issue. But friends are indeed part of the c++ language and it's important to understand them. So what is a friend of a class? A friend of a class is a function or another class that has access to private class members. And that other function or class is not a member of the class that it's accessing. In the case of friend functions, these can be standalone functions or member methods of another class. And in the case of another class, the entire class will have access to the private information of the class granting friendship. So as you can see, friends have unfettered access to both public and private data members of a class, but they're not members of the class.
+
+It's important to understand how c++ treats friendship in the big picture. First, friendship must be granted, not taken. A class must explicitly declare its friends in its class declaration using the 'friend' keyword. Friendship is not symmetric. So if a is a friend of b, that doesn't mean that b is a friend of a. This must be explicitly granted. Friendship is not transitive. If a is a friend of b and b is a friend of c, then a is not a friend of c, again unless specifically granted. And finally, friendship is not inherited.
+	class Player {
+		friend void display_player(Player &p);
+		std::string name;
+		int health;
+		int xp;
+	public:
+	. . .
+	};
+
+So how does declaring a friend look like in c++. Here you can see the case of declaring a standalone non-member function as a friend of the Player class. Notice that the Player class grants the friendship by declaring the function prototype preceded by the 'friend' keyword. That's it. Now the display_player() function has access to everything in the Player class.
+	void display_player(Player &p) {
+		std::cout << p.name << std::endl;
+		std::cout << p.health << std::endl;
+		std::cout << p.xp << std::endl;
+	}
+
+So in the display_player() function, we don't have to go through public getters or setters to display the Player information or set Player information. We can directly access the private class attribute. In fact, we can change them as well if we wanted to, since the object is passed by reference and, in this case, it's non-const.
+	class Player {
+		friend void Other_class::display_player(Player &p);
+		std::string name;
+		int health;
+		int xp;
+	public:
+	. . .
+	};
+
+Let's see how we would declare a method in another class as a friend. In this case, as shown above, we're declaring the display_player() method of the Other_class as a friend. That method will now have access to everything in the Player class. And that method might be implemented as follows.
+	class Other_class {
+		. . .
+	public:
+		void display_player(Player &p) {
+			std::cout << p.name << std::endl;
+			std::cout << p.health << std::endl;
+			std::cout << p.xp << std::endl;
+		}
+	};
+
+Notice that it is indeed a member of the Other_class. But you can use the Player class's private attributes directly within it.
+	class Player {
+		friend class Other_class;
+		std::string name;
+		int health;
+		int xp;
+	public:
+		. . .
+	};
+
+Finally, we can declare an entire separate class as a friend. In this case, we declare the class Other_class as a friend of Player. So all the methods in the Other_class will have access to the Player class's private attributes. As you can see friendship is very powerful, it can bypass function call overhead associated with getters and setters and other class methods and allow direct access to private attributes.
+
+Sometimes we have classes that use other classes and writing code using getters and setters becomes long, tedious and sometimes gives you overhead. However, that shouldn't be the only reason for granting friendship. Friendships should be granted only when it makes sense in the design of your system and then only the minimal necessary friendship should be granted.

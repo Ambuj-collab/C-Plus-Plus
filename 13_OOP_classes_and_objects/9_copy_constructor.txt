@@ -1,0 +1,54 @@
+We'll learn about the c++ copy constructor. When objects are copied, c++ must be able to create a new object from an existing object. In order to do this, it uses something called a copy constructor. There are several use cases where a copy constructor is used. For example, if we pass an object by value to a function or method as a parameter, then we need to make a copy of that object. The same is true when we return an object by value from a function or method. And the last common use case is when we want to construct a new object based on an existing object of the same class. C++ must provide a way to accomplish this copying. So c++ plus uses a copy constructor. We can provide our own copy constructor and we can define exactly the semantics we need for object copying. But if we don't provide a copy constructor, the c++ plus compiler will provide a compiler generated one.
+
+Let's look at some of the use cases in more detail, so you can see exactly when an object copy is required. The first use case is when we pass an object to a function or method by value. Remember, the default mode of passing data in c++ plus is by value, which means a copy is made.
+	Player hero {"Hero", 100, 20};
+	void display_player(Player p) {
+		// p is a COPY of hero in this example
+		// use p
+		// Destructor for p will be called
+	}
+	display_player(hero);
+
+So in the above example, we have 'hero' which is a Player object. And then we have a display_player function that expects a Player object by value. So when we call this function and pass in 'hero' Player object, the function parameter p, of Player type, will be created and it will be created as a copy of 'hero', using the copy constructor. Notice that p is local to the display_player function. So when p goes out of scope, the destructor will be called as well.
+	Player enemy;
+	Player create_super_enemy() {
+		Player an_enemy{"Super Enemy", 1000, 1000};
+		return an_enemy; // A COPY of an_enemy is returned
+	}
+	enemy = create_super_enemy();
+	
+In the above use case, we have an enemy object which is a Player. We also have a function create_super_enemy() that creates and returns a Player object. Notice that the Player object an_enemy is created in the function and then returned from this function. Since we're returning an_enemy by value. A copy of the an_enemy object is made by the copy constructor.
+	Player hero {"Hero", 100, 100};
+	Player another_hero {hero}; // A COPY of hero is made
+
+The last use case we'll look at is when we want to explicitly create a new object from an existing object as shown above. In this example, we have a 'hero' Player object, and we want to create another object called 'another_hero' based on 'hero'. In this case, a copy is made using the copy constructor.
+
+So now you can see where copy constructors are used. Now let's see what they do. If you don't provide a copy constructor, c++ will generate a default copy constructor that will do member-wise copy. That means that it'll go through the class attributes and copy them from the source object to the target object. For attributes that are objects then their copy constructors will be called. In many cases, this is perfectly fine and the default copy constructor is all you need. But if you're using raw pointers, then only the pointer will be copied, not the data that it's pointing to. This is referred to as a shallow copy rather than a deep copy.
+
+So best practices with copy constructors are: 1) Always providing user-defined copy constructor if you're using raw pointers, 2) Always implement the copy constructor with a const reference parameter, 3) Use the standard template library(STL) classes as member attributes as they already provide copy constructors Or 4) You can avoid using raw pointers as data members if possible or use smart pointers.
+
+So how does the method signature look like for a copy constructor?
+	Player::Player(const Player &source);
+
+The syntax might look strange at first but it's pretty straightforward. First, it's a constructor, so it has the same name as the class. And, in the parameter list, we have a single object passed in of the same type. We pass that object as a reference and a constant. Why by reference and constant? First, if we pass it in by value, then we have to make a copy of it. That's the whole point of the copy constructor. We would defeat the purpose and end up with never ending recursive calls. And as a constant because the semantics of copying means that we're copying the source, we're not modifying it. So the const prevents any modification to the source object.
+
+So how do we actually implement the copy constructor?
+In the next video, we'll look at the case where we have raw pointers as data members and we'll do a deep copy. In this video, we'll just concentrate on shallow copies. In the body of the copy constructor, we do whatever we need to initialize our new object. Remember, we have access to source, so we can reference any attributes we want from source. But rather than write assignment statements in the copy constructor body, we can use a constructor initialization list as we've done before.
+	Player::Player(const Player &source)
+		: name{source.name},
+		  health {source.health},
+		  xp {source.xp} {
+	}
+	
+		OR
+	
+	Player::Player(const Player &source)
+		: name{source.name}, health {source.health}, xp {source.xp} {
+	}
+
+Of-course, any code we write in the copy constructor body will be executed immediately after the new object is initialized.
+
+Now one thing that I should mention is, right here(i.e., in the copy constructor) we're using the initializer list to initialize that new object. We could change this if we like and just do something like, use a delegating constructor here, right.
+	Player::Player(const Player &source)
+		: Player {source.name, source.health, source.xp} {
+	}

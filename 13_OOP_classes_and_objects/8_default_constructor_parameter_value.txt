@@ -1,0 +1,19 @@
+When we learned about c++ functions, we learned that we can supply default values as parameters to functions. The same applies to class methods and class constructors. In many cases, we can reduce the number of overloaded constructors by providing default values to constructor parameters. The same rules that we learned when working with default function parameter value apply to constructors.
+
+Let's continue working with our Player class. We can actually just have one constructor that does everything that we did with the three constructors previously. You can't always have default values to parameters when you are designing class, but many times you can and when you can, you should because it really simplifies your code.
+	class Player
+	{
+		private:
+			std::string name;
+			int health;
+			int xp;
+		public:
+			// Constructor with default parameter values
+			Player(std::string name_val = "None",
+				int health_val = 0,
+				int xp_val = 0);
+	};
+
+This is very handy and results in less code to write, which means less code to test, which means less code that could have errors. Since this single constructor is doing the job of several constructors, we have to be careful not to declare ambiguous constructors. For example, what would happen if we implemented a no argus constructor in addition to the one we see on this slide? Well, we'd get a compiler error because the compiler wouldn't know which one to call.
+
+Let's see what happens if we supply a constructor and c++ has an issue with ambiguity. So in this case, remember, we're handling all of these types of initialization here, 0 argument, 1 argument, 2 arguments and 3 arguments, all with a single constructor. So what happens if I decide to do something like having no args constructor and I implement that. Well, hopefully, you'll see the problem when the compiler sees the code on the line of declaring no args constructor, it doesn't know what to do, it could call this default constructor or it could call this overloaded constructor with the three default parameters. It's not going to guess, it's just going to give you a compiler error.

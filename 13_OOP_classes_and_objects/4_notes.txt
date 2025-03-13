@@ -1,0 +1,24 @@
+Q) Abstraction vs Encapsulation
+Ans) Wrapping up attributes in a class and treating it as a simple unit. For example, a Person may have lots of attributes associated with it, such as name, age, address, etc. We create an abstraction of this information called Person.
+
+Encapsulation is physically putting all these attributes and any methods together inside a syntactic unit such as a class or structure.
+
+Abstraction is being able to 'think' about it as a Person and ignore the details that aren't relevant unless we need them.
+
+Q) What do the () stand for? Can't I allocate object of a class without it? Like this: 'Account frank=new Account;'
+Ans) In both cases the default constructor will execute.
+Account *acc1  = new Account();
+Account *acc2 = new Account;
+
+Q) The code below, why it prints out the data even when I free the memory on the heap.
+    Computer* surface = new Computer();
+    surface->set_specs("Surface Md5"," Core i7");
+    println((*surface).get_specs());
+    delete surface;
+    // this line?
+    println(surface->get_specs());
+Ans) When we 'delete' heap storage, we simply mark the area in the heap as 'ready to be allocated again'. Nothing gets 'deleted' or overwritten or cleared. So, if you use a deleted variable again then you will likely get the same data that was there previously.
+
+Remember, the design of C++ is for performance efficiency, so it won't waste time clearing out heap memory when the programmer deletes it.
+
+Q) 

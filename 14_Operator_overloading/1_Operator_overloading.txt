@@ -1,0 +1,154 @@
+We’ll learn about operator overloading in c++. C++ allows the programmer to overload most operators to work with user-defined classes. This is intended to make code more readable and writable by allowing the use of familiar operators in a familiar manner, but with our own classes and objects. First, look at exactly what operator overloading is and some of the basic rules that C++ enforces. We’ll start with the assignment operator. The assignment operator is a very important operator in C++. It defines the semantics of what happens when you assigned one object to another. C++ provides a default way of doing object assignment, much as it did with the copy constructor that we learned about in the last section. However, many times we want to be in control of what happens during object assignment, and we can overload the assignment operator to do exactly that. For example, when we use raw pointers in our classes, we must provide our own version of the assignment operator. Additionally, we could override the assignment operator to handle both copy and move semantics as we did with the copy and move constructors in the last section. We will learn how to do that in this section. We’ll also see how we can overload other operators as both member functions and its global functions, and why do we want to choose one over the other. We’ll finish up this section by overloading the stream insertion and extraction operator, so that we can easily use our objects with c++ streams just like we've been doing with the built-in types. So let's get started with operator overloading.
+
+Overloading the assignment operator(copy):
+===============================================
+Before we get into declaring and defining overloaded operators for our own classes, let's understand what they are. We've already seen what operators are and how to use them. We have traditional operators with traditional meetings/purposes. These include the plus(i.e., +) symbol for addition, the equal(i.e., =) sign for assignment and many more. The c++ operators are defined to work with the primitive or built-in c++ types, such as integers, doubles, longs and so forth. In fact we've already seen that the c++ operators are overloaded to work with different types. For example, the plus symbol can add two integers, two doubles, an integer and a double and so forth. C++ allows us to overload operators for our own user-defined types. This allows our types to behave and feel similar to the built-in types. When we overload operators, it can make our code more readable and more writeable. The only operator that the compiler provides a default implementation for is the assignment operator, the single equal sign. That's because the compiler must be able to assign one object to another. All the other operators that can be overloaded must be explicitly defined by the programmer. So how does operator overloading look like from the perspective of using the objects. Well, first, let's see how we would write code if we were not overloading operators.
+
+Suppose we've implemented our own class named Number, and that class can model any kind of number: an integer, a double, a complex number, an irrational number, you name it. If we want to be able to manipulate Number objects so that we can add them, subtract them, multiply them and so forth, we could implement non-member functions or member functions to achieve what we want. So if we wanted to add a and b, then multiply that result by the quotient of c divided by d. Our code might look like below. 
+	Number result = multiply(add(a,b),divide(c,d));
+
+If we wanted to use member methods then we need objects and method names, so our code might look like below. Are these statements very unreadable and very difficult to write?
+	Number result = (a.add(b)).multiply(c.divide(d));
+
+Maybe it depends on your perspective, but the point is that we're adding, dividing and multiplying and we've been using these operators(+, /, *, etc) to do that since we were little kids in school, why can't we use them now?
+
+Ofcourse, the answer is that c++ doesn't know what to do with our user-defined types. In most cases, it makes no sense to add or multiply or subtract your objects. For example, what does it mean to subtract two Player objects in a game or multiply two Account objects? It's totally dependent on what you want to do. In many cases, it doesn't make sense to overload certain operators for your classes. In those cases don't do it. Only do it if it makes sense. In this example, I would argue that it does make sense since the users of the Number class would know the meaning and how to use those operators that we would overload. Let's see what our calculation would look like if we overloaded the addition, multiplication and division operators.
+	Number result = (a+b)*(c/d);
+
+Here you can see that our user-defined Number class now looks and feels and behaves like the built-in c++ types. Operator overloading is syntactic sugar. Behind the scenes, we're still calling methods or functions. We will see that later.
+
+So what operators can be overloaded? Well, c++ allows you to overload most of its operators. There are a few exceptions and they're listed in the table. We can't overload the scope resolution operator(::), the conditional operator(?:), the pointer to member operator(.*), the dot operator(.) and the sizeof operator. Remember, just because an operator can be overloaded doesn't mean you should. Don't overload it unless it makes sense and makes your code more usable, more readable and more writable.
+
+So as always, there are some basic rules that must be followed when you're overloading operators. First the precedence and associativity of the operator that you're overloading cannot be changed. This makes perfect sense since c++ programmers are already familiar with the precedence and associativity of its operators. The arity of an operator cannot be changed. So if an operator is a binary operator, which means that it's applied to two arguments, then this can't be changed. C++ does not allow you to change the way that the current operators work with the built-in types. C++ doesn't at all allow you to create new operators that are not currently used by c++. And finally, c++ allows you to overload operators using global functions or member methods. However, there are several operators that must be implemented as member methods as you can see(i.e., [], (), ->, =, etc). Notice that the assignment operator(i.e., =) must be implemented as a member method.
+
+Let's look at some examples where operator overloading could be used, as shown below. The first 3 shows examples of using operators with the built-in types. For example, we can use plus for addition of integers, doubles and longs and assignment. We also use the insertion operator(i.e., <<) with many built-in types so that we can easily insert values into streams. Now take a look at the last 3 examples. Here we have examples of using operators on user-defined types. The first is std::string. We can use the plus operator to concatenate strings, and we can compare strings using less than, greater than, less than or equal to and so forth. In this section, we're going to create our own version of a string class named Mystring and, we want to be able to overload some operators to concatenate 2 Mystring objects, compare them, assign them and so forth. The last example is the Player class. Does it make sense to overload operators for the Player class? Maybe, it depends on what we're trying to achieve. For example, suppose we want to compare two Player objects p1 and p2. We might only care about their health attribute, and this would do just that. What about comparing two Player objects with the equality operator, are we comparing names, health, xp, all of those attributes or just some of them. That's one of the issues with overloading operators. We can make the operator mean anything we want. So we want to make sure that when we overload operators, it makes sense and the users of the class know about it. Finally, it would make sense to overload the stream insertion(i.e., <<) operator so that we can insert Player objects into a stream.
+
+int
+=====
+a = b + c
+a < b
+std :: cout << a
+
+double
+========
+a = b + c
+a < b
+std :: cout << a
+
+long
+======
+a = b + c
+a < b
+std :: cout << a
+
+std :: string
+===============
+s1 = s2 + s3
+S1 < s2
+std :: cout << s1
+
+Mystring
+==========
+s1 = s2 + s3
+s1 < s2
+s1 == s2
+std :: cout << s1
+
+Player
+========
+p1 < p2
+p1 == p2
+std :: cout << p1
+
+So let's look at the class that we'll be using in this section of the course. 
+	class Mystring {
+	private:
+		char *str; // C-style string
+
+	public:
+		Mystring();
+		Mystring (const char *s);
+		Mystring (const Mystring &source);
+		~Mystring();
+		void display() const;
+		int get_length() const;
+		const char *get str() const;
+	};
+
+We're going to add code for overloaded operators to this basic class called Mystring. Mystring class models a string and will implement it behind the scenes using a raw c-style pointer. I choose to include a raw pointer because it will allow us more practice with our copy and move constructors, and we'll also have to think about copy and move assignment when we overload the assignment operator. Right now the class contains a no args constructor, a constructor that expects a c-style string or string literal, a copy constructor, a destructor, a display() method that displays the string and two getter methods. The first one returns the current length of the string and the other returns a pointer to the string. That's it. At this point in the course, you should start feeling pretty comfortable when you see a class declaration such as this.
+
+Now, we'll learn how to overload the copy assignment operator. The assignment operator is used by c++ when it assigns one object to another object. Don't confuse assignment with initialization. Initialization is done by constructors when we create new objects.
+	Mystring s1 {"Frank"};
+	Mystring s2 = s1;  // NOT assignment, same as Mystring s2{s1};
+
+The statement 'Mystring s2 = s1;' is not an assignment statement, it's an initialization statement because s2 hasn't been created yet. C++ allows us to use the assignment operator in this context but this assignment is really equivalent to 'Mystring s2{s1};'. It will invoke the copy constructor.
+	s2 = s1; // assignment
+
+Notice the statement 's2 = s1'. This is assignment since s2 has already been created and initialized previous to this statement. So an assignment occurs when an object has already been created and initialized and you want to assign another object to it. C++ provides a default way of assigning one object to another. And if you don't provide your own overloaded assignment operator, then c++ will provide a compiler generated one for you. This is very similar to what it does with the default copy constructor. The behavior for the default assignment is member-wise assignment, which means shallow copying. If your class doesn't have raw pointers, then the default assignment operator will probably be just fine. However, in Mystring class, we have a raw pointer, so we'll overload the assignment operator so that it will do deep copies of the pointed-to data on the heap.
+
+So how exactly do we overload the copy assignment operator? First, the assignment operator must be overloaded as a member function, so we can provide a method prototype that has the general pattern shown below. 
+	Type &Type: : operator=(const Type &rhs) ;
+
+We then simply replace Type with the name of our class. 
+	Mystring &Mystring :: operator=(const Mystring &rhs) ;
+	
+	s2 = s1;  // We write this
+	s2.operator=(s1);  // operator=() method is called
+
+Notice that the name of the method is 'operator='. That's how we declare methods that overload operators. The keyword 'operator' followed by the operator that we wish to overload. So for the Mystring class, the overloaded assignment operator method returns a reference to a Mystring object. This is important since we want to avoid extra copies if we return by value. And we also want to allow chain assignments, such as p1 = p2 = p3. We'll define this method below, but once it's defined, we can write code like s2 = s1, which assigns object s1 to object s2. That's very readable and writable code, and it feels exactly like if we were assigning one of the c++ built-in types, but now it's working with our own user-defined classes. That's pretty easy and pretty neat. The compiler will actually convert the s2 = s1 assignment statement to s2.operator=(s1) behind the scenes.
+
+Let's see how we would implement the overloaded copy assignment operator for the Mystring class. Below is the code for the overloaded copy assignment operator. It looks complicated but it really isn't.
+	Mystring &Mystring :: operator=(const Mystring &rhs) {
+		if (this == &rhs)
+			return *this;
+
+		delete [] str;
+		str = new char [std :: strlen(rhs.str) + 1];
+		std :: strcpy(str, rhs.str) ;
+
+		return *this;
+	}
+
+Remember, the object on the left-hand side of an assignment statement is referred to by the 'this' pointer. And the object on the right-hand side is being passed into the method. I've named the right-hand side object as 'rhs', as shown above, for right-hand side to be clear. Since we're assigning the right-hand side object to the left-hand side object, we must make a deep copy of the right-hand side object's attributes and copy them over to the left-hand side object. So what does this mean semantically? Well, the left-hand side object or 'this' object will be overwritten. So we need to de-allocate anything it refers to on the heap. Then we have to allocate space in the left-hand side object for the right-hand side object's data, and then we finally copy the data over to the left side from the right side. The first thing we want to do is check to see if we're doing self-assignment. For example, p1 = p1 or assign p1 to itself. We can easily check for that by checking the address of the left-hand side object, which is in the pointer 'this' and comparing it to the address of the right hand side object. If they're the same, then we really don't want to do anything and we just return de-reference this(i.e., *this), which is the left-side object. If we don't have self-assignment, then we need to de-allocate storage for 'str' pointer of object pointed by 'this', since it's pointing to a string on the heap. We need to de-allocate the storage. Otherwise when we copy the new data over, we'll orphan this memory and end up with a memory leak. Now the left side object is ready to be assigned from the data from the right side object, but we haven't yet allocated storage on the heap for the deep copy. So we need to allocate enough storage on the heap, that's the size of the string in the right object plus 1, since we need the space for the string terminator. That's it. Now we can do the copy. We can perform the copy by copying over one character at a time until we see the null character. But since we're using a c-style string, we can simply call the string library method std::strcpy, which copies the string from the right-hand side object to the left-hand side object. That's it. We're done. All we have to do now is return the left side object, so we can support assignment chaining. This may seem like a lot at first, but it's a pattern or idiom that we always use in c++ when we're doing deep copy assignment. In this case, we only have a single raw pointer. If your class has multiple raw pointers, then don't forget to deep copy each of them.
+
+main.cpp file:
+===================
+	Mystring a {"Hello"};                // overloaded constructor
+    Mystring b;                             // no-args contructor
+    b = a;                                      // copy assignment 
+                                                  // b.operator=(a)
+    b = "This is a test";                 // b.operator=("This is a test");
+
+Now this example here(i.e., b = "This is a test";) is also an assignment because we're assigning something to 'b' and 'b' already exists. In this case, it's a little bit different because we don't have an 'operator=' that expects a character pointer, right, because we are assigning c-style string. So what C++ will do is that it constructs a temporary object using the overloaded constructor(i.e., parameterized constructor) just like what we did over here(i.e., object 'a'), and then assign that temporary object to 'b' and then that temporary object will eventually be destroyed. In other words, we're going to call the overloaded operator(i.e., parameterized constructor) to create that temporary object. And then once that object is created, we'll assign it over to 'b'. So, that, temporary object is going to be assigned over. So let's just walk through that really quickly here using debugger. And you can see right here I'm calling the overloaded constructor, which is going to create a temporary object. And now that temporary object will be assigned. So you can see the assignment operator being called now. And to get rid of the temporary object. That's the destructor being called right there. Put the breakpoints at the start of constructors, copy constructor, destructor, overloaded assignment operator and then debug the code, that way it will be more clear.
+
+So that gives you an idea of the overloaded copy assignment operator. It's pretty straightforward. We don't want to do anything related to shallow assignment, right. We want to do deep assignment. Otherwise, we're going to end up with all kinds of problems.
+
+Overloading the assignment operator(move):
+===============================================
+Now, we'll overload the move assignment operator for our Mystring class. Remember, the copy assignment operator that we just overloaded above works with l-value references. The move assignment operator that will overload in this video works with r-value references. Again, think about temporary unnamed objects. You don't have to provide a move assignment operator. And if you don't, c++ will use the overloaded copy assignment operator by default. But, as we said, when we talked about the move constructor, move semantics can be much more efficient, and it's not a lot of extra work to provide a move constructor and a overloaded move assignment operator.
+	Mystring s1;
+	s1 = Mystring {"Frank"}; // move assignment
+
+First, let's see when the overloaded move assignment operator will be used. Above, you can see that we create a Mystring object s1, that's basically just an empty string. Now we assign the Mystring object with the string 'frank' to it. Notice that the Mystring object initialized to 'frank' must be constructed. And once it's constructed, it has no name, it's a temporary object. So it's an r-value. That means that when we assign it to s1, the overloaded move assignment operator will be called since we're providing an r-value reference. Let's see how to do this syntactically. 
+	Type &Type::operator=(Type &&rhs) ;    // Syntax
+	
+	Mystring &Mystring::operator=(Mystring &&rhs) ;  // method prototype
+
+You'll notice the overloaded move assignment operator declaration is very similar to overloaded copy assignment operator. But there are a few differences. First, we use the double ampersand operator(i.e., &&) in the parameter list to tell the compiler that the right-hand side object is an r-value. So the right-hand side(i.e., rhs) local variable will be an r-value reference. Second the right-hand side object reference(i.e., rhs) can't be const since we'll be modifying that object when we move the data. So the declaration for the overloaded move assignment operator returns a Mystring object by reference and expects an r-value reference to a Mystring object.
+	s1 = Mystring{"Joe"};		// move operator= called
+	s1 = "Frank";	// move operator= called
+	
+You can see that in the two assignment statements above, the overloaded move assignment operator will be called because the right-hand side of the assignment statements are r-values. At this point, that temporary object(i.e., Mystring{"Joe"} or "Frank") has no name, so it's an r-value. If we don't provide any move semantics, then it's going to use a overloaded copy assignment operator to do what it needs to do. Now what we want to do is we want to assign 'Mystring{"Joe"}' guy over to 's1' guy. But we really don't want to do the overhead of copying because we don't need to. This temporary object(i.e., Mystring{"Joe"}) will be destroyed soon. So let's just use overloaded move assignment operator so that we can steal that pointer and not have to make any copies of anything or copy anything over.
+	Mystring &Mystring: :operator=(Mystring &&rhs) {
+		if (this == &rhs)	// self assignment
+			return *this;	// return current object
+
+		delete [] str;	// deallocate current storage
+		str = rhs.str;	// steal the pointer
+
+		rhs.str = nullptr;	// null out the rhs object
+
+		return *this;	// return current object
+	}
+
+So let's look at the code for the overloaded move assignment operator for this example. As you would expect, the code is very similar to the overloaded copy assignment operator with the exception that we're not deep copying from the right-hand side object. Instead, we're simply stealing the pointer and then nulling out the right-hand side pointer. Again, you can see from this code how much more efficient this is compared to overloaded copy assignment. Let's walk through this one step at a time. First, we check for self-assignment. And if we're self-assigning, then we return the left-hand side object, and we're done since there was nothing to do. Otherwise, we again de-allocate the storage pointed to by the left side object's 'str' data member since we'll be overriding this, and we don't want a memory leak. Now the left-hand side object is ready, so let's move the 'str' pointer over. First, we steal the 'str' pointer from the right-hand side object and assign it to the left-hand side object. This is simply a copy of a pointer variable. We're not doing a deep copy here. Then we null out the 'str' pointer on the right-hand side object. This step is critical. Finally, we return the left-hand side object.
