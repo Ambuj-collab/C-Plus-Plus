@@ -1,0 +1,203 @@
+I'd like to go over the basics of algorithms in the standard template library. The STL algorithms work on sequence of elements that are obtained from STL containers using STL iterators. It's really a beautifully designed library. The STL has many common and useful algorithms. Once you learn how to use them, you'll keep coming back to them over and over again. There are many algorithms and the algorithms themselves have many variants, way too much to describe in a single section of a course. I'll go over some useful algorithms, but more importantly, I'll teach you the techniques involved so that you can use any STL algorithm. You can refer to online references such as cppreference.com for details about the entire algorithms library. Many of the algorithms in the STL require the programmer to provide extra information in order for them to work. For example, suppose we want to display all the even numbers in a container, we can use an algorithm called for_each() that will apply a function to each element in the container, but it depends on the programmer providing that function. So there are three main ways in the STL to provide such information to algorithms. They are functors or function objects, function pointers and lambda expressions. I'll show you a simple example of each so you know them. But I'll be using lambda expressions for the examples in this section. You should also use lambda expressions in your code since this is how to do it going forward in modern c++.
+
+So how do these algorithms look like and how do we use them? We saw a simple example of using the accumulate algorithm a few videos back. But in this video, I want to show you a few more and then we'll write some code in the IDE. First, in order to use the STL algorithms, we must include the <algorithm> header file. It's also important to understand that different containers support different types of algorithms and since algorithms depend on iterators, this determines the types of algorithms we can use with certain containers. I know this sounds complicated but it's really not so bad. As you become more experienced with the STL, it all becomes second nature.
+
+So before I show you some examples of STL algorithms in action, let's talk about Iterator Invalidation. This topic can get quite complex but let's look at it in its simplest terms. We know that iterators point to container elements. We need to understand that it's possible that an iterator may become invalid during processing. Let's see a very obvious example. Suppose we have an iterator and we're iterating over the elements of a vector and displaying the elements as we go. While we're doing this, we called the vector's clear() method. This deletes all the elements from the vector but the iterator doesn't know that. The iterator will happily continue iterating until it sees the end of the vector but the memory its pointing to is no longer valid. If something like this happens, then the behavior is undefined in c++. Every STL container has documentation about when iterators become invalid. We won't worry too much about it in this section but it's something to be aware of as you move on to more advanced STL work after this course.
+
+Iterator Invalidation in C++:
+===============================
+When the container to which an Iterator points changes shape internally, i.e. when elements are moved from one position to another, and the initial iterator still points to the old invalid location, then it is called Iterator invalidation. One should be careful while using iterators in C++. When we iterate over our container using iterators then it may happen that the iterator gets invalidated. This may be due to change in the shape and size of the container while iterating. 
+
+For example, Iterator invalidation in a vector whenever either, at any point in the vector, an element is inserted or an element from the vector is removed. Let us take an example to understand this.
+	// CPP program to demonstrate iterator invalidations
+	#include <bits/stdc++.h>
+	using namespace std;
+
+	// Driver Code
+	int main()
+	{
+
+		// Creating a sample vector
+		vector<int> v = { 1, 5, 10, 15, 20 };
+
+		// Changing vector while iterating over it
+		// (This causes iterator invalidation)
+		for (auto it = v.begin(); it != v.end(); it++)
+			if ((*it) == 5)
+				v.push_back(-1);
+
+		for (auto it = v.begin(); it != v.end(); it++)
+			cout << (*it) << " ";
+
+		return 0;
+	}
+
+In the above example code, it may happen that when we add an element -1 while iterating the vector, the size of the vector can get more than the maximum size due to which a new memory is allocated to the vector and all elements are copied there. But, our iterator still points to the previous old memory address. So, now we can say that iterator gets invalidated. This is one example of invalidation.
+
+So let's see some examples of STL algorithms. First, let's look at the std::find() function. The std::find() algorithm tries to locate the first occurrence of an element in a container. Like most STL algorithms, there are many variants available. So let's keep it simple. If the std::find() function finds the element, it returns an iterator that points to the element it just found and if the function does not find the element, it will return an iterator pointing to the end of the container, pretty simple. 
+	std::vector<int> vec {1,2,3};
+	auto loc = std::find(vec.begin(), vec.end(), 3);
+	if (loc != vec.end())		// found it!
+		std::cout << *loc << std::endl;		// 3
+
+So let's see this in code, as shown above. First we declare a vector of integers, we'll call it 'vec' and we initialize it with the integers 1, 2 and 3. We then call std::find() and pass in the iterators we need to get the sequence of elements we want. After that, we pass in the element we want to find. In this case, we call std::find() with vec.begin(), vec.end() and 3. So we want to find 3 and we want to search the entire vector. The result of the function will be stored in a variable 'loc'. I'm using auto to let the compiler deduce the type of 'loc' but you know what it must be, an iterator to a vector of integers. That's it. Now we can check the value of 'loc' and if it's not vec.end(), we know 'loc' is pointing to the first occurrence of 3 and we can do whatever we want with it. In this case, I'm just displaying it. So let's take a breath here and understand the power we have. We just found the first occurrence of an element in a vector. What if we wanted to find the first occurrence in a list or another type of container. It works exactly the same way. That's the power I'm talking about. We don't need to know the details about how the container is implemented or how complicated finding an element might be behind the scenes. Remember, std::find() needs to be able to compare two elements in order to see if they're the same. In order to do this, it will use the equality operator. For primitive types like int, we don't have to do any thing since the compiler knows how to compare primitive types. But if we're using our own user-defined objects in containers, then we must provide the overloaded equality operator for our objects since that's what the algorithm will call.
+	std::vector<Player> team { /* assume initialized */ }
+	Player p {"Hero", 100, 12};
+	auto loc = std::find(team.begin(), team.end(), p);
+	if(loc != vec.end())		// found it!
+		std::cout << *loc << std::endl;		// operator<< called
+
+In this case, you can see we have a vector of Player objects. Let's assume that it's initialized to a bunch of Player objects and we define 'p' to be the Player we want to find in the vector. Notice the code for the std::find() function. It looks the same as for vector of integers. The only difference is that the compiler will compare 'p' to the container elements using the overloaded equality operator that you must provide in the Player class. Also, we can define what equality means. We might want all Player attributes to match or only the 'name' attribute or only the 'xp' attribute. We have all the power to decide.
+
+Now let's look at a more complex algorithm, the std::for_each() function. This function[i.e., std::for_each()] applies a function to each element in the iterator sequence but which function does it apply? Whatever function you tell it to apply. That's pretty cool. So how do we provide this function to the std::for_each() function? There are three ways, and I'll show you each way in the following slides. We can use functors, function pointers and lambda expressions. Functors and function pointers have been around since the beginning of the STL. Lambda expressions were added in c++11 and they're really the way to go in modern c++.
+
+Functors:
+============
+	struct Square_Functor {
+		void operator()(int x) { 	// overload () operator
+			std::cout << x * x << " ";
+		}
+	};
+
+	Square_Functor square;		// Function object
+	std::vector<int> vec {1, 2, 3, 4};
+	std::for_each(vec.begin(), vec.end(), square);
+	
+Output:		1 4 9 16
+
+So let's write a std::for_each() function that displays the square of each integer element in the vector. First, let's do it with a functor. In the above code, we'll see how we can use a functor or function object, but let's start at the bottom first. In the last statement, we're using std::for_each() function and providing the iterators as parameters, as usual. So this will iterate over the entire vector 'vec'. Now look at the last parameter 'square'. In this case, 'square' is an object, a function object of type Square_Functor. And Square_Functor is a structure. It can also be a class that has a single public method. Inside the structure, the method that's being overloaded is the function call operator[i.e., ()]. That's the open and close parentheses. It expects a single item/parameter, that's the same type as the elements in the container we're processing. And in this case, it executes the overloaded function call[i.e., ()] operator code for each integer passed into it. I know this sounds pretty complicated but let's walk through it. We're going to iterate through each element in the vector and in each iteration, the overloaded function call[i.e., ()] operator function of the 'square' object will be called and the current container element is passed to it. In this case, we'll call square() and pass each container element, square of it will be displayed. So in this case, we get 1, 4, 9 and 16.  Note that the original container elements are not modified.
+
+
+Function pointer:
+====================
+	void square(int x) {	// function
+		std::cout << x * x << " ";
+	}
+
+	std::vector<int> vec {1, 2, 3, 4};
+	std::for_each(vec.begin(), vec.end(), square);
+
+Output: 1 4 9 16
+
+Now let's do the same thing but using function pointer instead of a functor. Again, let's start at the bottom. Notice that the code for the std::for_each() algorithm is exactly the same. But in this case, the 'square' parameter is not a function object, it's the name of a regular function and we declared that function at the top. What's being passed into the std::for_each() function, as a 3rd parameter, is a pointer to the 'square' function, which is really the address of the function 'square' itself. So at each iteration of the std::for_each(), the 'square' function will be called and the current container element passed into it. So we get the same output as with the functor: 1, 4, 9 and 16. Notice that we only use the function name as the parameter of std::for_each(), we don't place parentheses after it since that would call the function and that's not what we want.
+
+
+Lambda expression:
+=====================
+	std::vector<int> vec {1, 2, 3, 4};
+	std::for_each(vec.begin(), vec.end(),
+		[](int x) { std::cout << x * x << " "; }) 		// lambda
+
+Output: 1 4 9 16
+
+Finally, we'll use a lambda expression to accomplish the same thing. In the example above, we'll use the lambda expression directly in the std::for_each() function call. Lambda expressions were introduced in c++11 as I said and they're widely used in modern c++. If you come from another language, you may know them as lambdas, closures, blocks or anonymous functions, it's basically all the same. First, notice that we have no other code except the call to the std::for_each() algorithm. One of the benefits of lambda expression is that we can define them right where they're being used. The first part of the std::for_each() function is the same, we're providing our iterators. The last parameter is what changes and in this case, we're using a lambda expression. The syntax of the lambda expression will become more clear with time and practice, but it consists of a pair of square brackets followed by the parameter that will be passed into the lambda expression in parentheses. In this case, a single integer which we have named 'x'. Then it is followed by the body of code we execute. That's it. It's really pretty easy and all in one place, so we know exactly what's happening in each iteration by looking right in the std::for_each() function call. 
+
+Now, I'd like to go over some of the algorithms in the STL. Now there are a lot of algorithms in the STL, I'm only going to cover a few of them but the techniques you'll see apply to many of them and you can be very productive with them very quickly. So, Let's head over to the IDE.
+	#include <iostream>
+	#include <vector>
+	#include <list>
+	#include <algorithm>
+	#include <cctype> 
+
+Let me just go over these #include real quick, as shown above. I am including <algorithm>. We need that to use these algorithms. I'm also including <vector>, <list> and <cctype>. Now, <cctype> we're going to use for the toupper() function that converts a character from lowercase to uppercase. That's the only reason we're going to do it and in most of the examples we use a 'vector' but there's one that's going to use the 'list' just to change things around a little bit.
+	class Person {
+		std::string name;
+		int age;
+	public:
+		Person() = default;
+		Person(std::string name, int age) 
+			: name{name}, age{age}  {}
+		bool operator<(const Person &rhs) const {
+			return this->age < rhs.age;
+		}
+		bool operator==(const Person &rhs) const {
+			return (this->name == rhs.name && this->age == rhs.age);
+		}
+	};
+
+We're also going to use this Person class that I defined right above. It's a really really simple Person class. A Person has a 'name' and 'age' attributes. I think we've used a class like this or very similar to this before. I have a default constructor that compiler will generate for me. I've got an overloaded parameterized constructor that expects a name and age. Then I've got these two overloaded operators(i.e., < and ==). These are really important. Whenever we use the STL, it's got to have a way to compare our own objects. Now these are all user-defined types. So I need to provide an implementation for overloaded less than(i.e., <) and equality(i.e., ==) operators and in the overloaded less than operator method, all I'm doing here is I'm saying that one Person is less than another Person if their 'age' attribute is less than the other Person's age. This is just totally arbitrary in this example. This really would depend on whatever business logic you're using. And how do I compare 2 Person objects, whether they are same or not? Well, their 'name' attribute have to be the same and their 'age' attribute have to be the same. So that's it, a real simple Person class that we're going to use it here.
+	std::cout << "\n========================" << std::endl;
+
+    std::vector<int> vec {1,2,3,4,5};
+    
+    auto loc = std::find(std::begin(vec), std::end(vec), 1);
+    
+    if (loc != std::end(vec))
+        std::cout << "Found the number: " << *loc <<  std::endl;
+    else 
+        std::cout << "Couldn't find the number" << std::endl;
+
+What is the algorithm we're using? The algorithm is right there. That function is the std::find() function. It finds an element in a container, more specifically, the first occurrence of the element in the container. So what are we going to do? Let's create a vector of integers with 1, 2, 3, 4 and 5. And then I'm going to call std::find(). I'm going to give it the iterators pointing to the beginning and the end. Now notice that this syntax[std::begin(vec) and std::end(vec)] here is a little different, I just wanted to show you that syntax in case you run into it. It's equivalent to vec.begin() and vec.end(), like we've seen before. But in this case, it's std::begin() and you pass in the vector object(i.e., 'vec') or the container. So it's just another way to do, it means exactly the same thing. So let's get back to this. I'm calling the std::find() function and I'm passing in where I want to start, where I want to end, right, that's the sequence that I'm going to get back from the container as I'm using these(i.e., begin and end) iterators and that's where I want to find. Now the 3rd parameter is what I want to find and that element is 1. I know it's there in the vector 'vec'. Now what does this[i.e., std::find()] return? Well, if it finds it, it will return an iterator pointing to it. If it doesn't find it, it'll return an iterator to the end. So it's really simple to check. If the 'loc'(it's an iterator to vector of integers) is not equal to the end of the vector, then we found it. We found the number and we could just dereference it and print it out. In this case, it'll print out 1. Otherwise, we couldn't find the number. The really cool thing about this is I can find the first occurrence of an element in any container. That's mind-blowing right, because you're not worried about how this stuff is implemented. You've got all these different containers, how easy is this. I just want to find some things, just go and call std::find(), provide where do I start, where do I end and what do I want to find. That's real classic abstraction, that's pretty cool. That's using a primitive type, an integer. How would it look like if we're trying to find a Player? So that's what the below example is going to show you.
+	std::list<Person> players {
+        {"Larry", 18},
+        {"Moe", 20},
+        {"Curly", 21}
+    };
+    
+    auto loc1 = std::find(players.begin(), players.end(), Person{"Moe", 20});
+    if (loc1 != players.end())
+        std::cout << "Found  Moe" << std::endl;
+    else
+        std::cout << "Moe not found" << std::endl;
+		
+In this case, I'm not using a vector, I'm using a list, but it's all the same. I've got a list of Person objects. I'm calling them 'players'. I'm initializing it with Larry is 18 years old, Moe is 20 and Curly is 21. Remember, that is the Person class I wrote above. I want to find that person(i.e., Person{"Moe", 20}) in this list. Look at the code, auto loc1 = std::find(), where do I start, where do I end, what do I want to find. The STL algorithm[i.e., std::find()] is going to use the equality operator that I've overloaded for my Person class to compare these guys. So if 'loc1' is not equal to the end, then I found Moe. Otherwise, I didn't find Moe. And how do I know that two Person objects are same. Well, 'name' and 'age' attributes has be the same of both the objects. Remember, our equality operator is checking for both. That shows you how to use the std::find() function, super powerful. I mean when you think about it how hard is it to write a find() function for an array. It's not really. You start at the beginning and you move along, we found it. I'm done. But what about a list, a doubly linked list, a priority queue, a set. Wow, that's a lot of code you would have to write by yourself. But just by using STL, you don't have to worry about any of that. You just call std::find() function, tell it where to start, tell it where to end and tell it what you want to find, and you're done, it's as simple as that.
+	std::cout << "\n========================" << std::endl;
+    std::vector<int> vec {1,2,3,4,5,1,2,1};
+    int num = std::count(vec.begin(), vec.end(), 1);
+    std::cout << num << " occurrences found" << std::endl;
+
+Let's see the std::count() STL algorithm. All it does is, it counts the number of occurrences of a specific element. In this case, I want to know how many times does the element 1 appear in this container 'vec'. Well, it occurs 3 times. So what's my algorithm? It's std::count(), pass the iterators pointing to the beginning and to the end. You can also use a subset of the container if you like. I'm always going to do from beginning to end in these examples. Now we could have used a constant iterator(i.e., const_iterator) here. We could use a lot of things. I'm just going to do real simple. std::count() will return an integer. If we get back 0, didn't find it. If we get back 1 or 2 or 3, that's how many times the element 1 occurred. So in this case, I expect back 3.
+	std::cout << "\n========================" << std::endl;
+
+    // count only if the element is even
+    std::vector<int> vec {1,2,3,4,5,1,2,1,100};
+    int num = std::count_if(vec.begin(), vec.end(), [](int x) { return x%2 == 0; });
+    std::cout << num << " even numbers found" << std::endl;
+    
+    num = std::count_if(vec.begin(), vec.end(), [](int x) { return x%2 != 0; });
+    std::cout << num << " odd numbers found" << std::endl;
+    
+    // how can we determine how many elements in vec are >= 5?
+    num = std::count_if(vec.begin(), vec.end(), [](int x) { return x>=5; });
+    std::cout << num << "  numbers are >= 5" << std::endl;
+
+And let's take a look at a more powerful one called the std::count_if(). So above is the std::count_if(). The std::count_if() is a little bit different. We're going to use the lambda expression for it. This one is super powerful. We're only going to count how many times that element occurs if it matches some condition. In other words, how many vector elements we have which is matching a specified condition. That condition is called a predicate, it's something that returns a true/false value. So I have my vector 'vec' and you can see that, what's my condition. Well, you can see the 3rd parameter of the std::count_if() function. Look at the lambda expression, the lambda tells you exactly what I'm doing. I'm only looking for numbers that mod 2 is 0. I'm only looking for even numbers here, right. That's what that predicate right there is doing. So I'm starting from the beginning of that 'vec' and I'm going towards the end of the 'vec'. For each element in that sequence, I'm passing it to the predicate function and that's going to return true or false. Depending on what it's returned from the predicate function, it's going to include it in the count. So in this case, what's being passed into this lambda function is 1, and then 2, and then 3, and then 4, and then 5 and so forth. And all it's doing is if this predicate return true, it's just counting them up. So in this case, we are counting how many even numbers do we have in the vector 'vec'. So I would expect 4 in the output. Below, you can see the second usage of std::count_if() algorithm, it's the same idea except this time, I'm looking for odd numbers. So, how many odd numbers do we have in the vector 'vec'. I would expect 5 in the output.
+	std::cout << "\n========================" << std::endl;
+
+     std::vector<int> vec {1,2,3,4,5,1,2,1};
+     for (auto i: vec) {
+         std::cout << i << " ";
+     }
+     std::cout << std::endl;
+     
+    std::replace(vec.begin(), vec.end(), 1, 100);
+    for (auto i: vec) {
+         std::cout << i << " ";
+     }
+    std::cout << std::endl;
+
+So let's take a look at std::replace() algorithm. Well, the above code is looking through a vector in this case or any container and it's going to replace one number with another. Pretty cool. So here I've got a vector 'vec'. I've got three element 1 in the vector 'vec'. I'm just displaying them before calling std::replace() function and then I'm calling std::replace(), I'm starting from the beginning, going till the end, and I'm replacing 1 with 100. And remember, I'm using primitive int type here but we can use our own objects if you like so. In this case, I'm replacing those three element 1 with 100 and then I'm just displaying the vector 'vec' again.
+
+Let's do a couple of more and the point of this is not to show you these specific algorithms. There's, like I said, over 50, probably closer to 90 algorithms out there. If you look at the <numeric> header as well, they all work in a similar way, they all use iterators, many of them use predicates. So this gives you a pretty good feeling for the power that's out there and the things you can do. So let's see the std::all_of() algorithm. 
+	std::vector<int> vec1 {1,3,5,7,9,1,3,13,19,5};
+    if (std::all_of(vec1.begin(), vec1.end(), [](int x) { return x > 10; }))
+        std::cout << "All the elements are > 10" << std::endl;
+    else    
+        std::cout << "Not all the elements are > 10" << std::endl;
+    
+    if (std::all_of(vec1.begin(), vec1.end(), [](int x) { return x < 20; }))
+        std::cout << "All the elements are < 20" << std::endl;
+    else    
+        std::cout << "Not all the elements are < 20" << std::endl;
+
+So above is my vector 'vec1' and we initialize it with 1,3,5,7,9,1,3,13,19 and 5, just some arbitrary numbers in there. What the above piece of code is doing. There is the function std::all_of(). It's going to see whether all of the elements in that container match this predicate i.e., [](int x) { return x > 10; }. That's super powerful. So in this case, I'm saying if all of those vector's elements are greater than 10 then this[i.e., std::all_of()] will return true. Otherwise, it will return false. In the second 'if' block, all we are doing is that I'm starting from the beginning, going towards the end, I'm checking to see if all the vector's elements are less than 20. You can see in here(the vector 'vec1'), they are actually less than 20. Every single one of them is less than 20. So, std::all_of() will return true. As we have the std::all_of() algorithm, there's also another algorithm called std::any_of(). So if any of them(vector's elements) is greater than 10, it'll be true. I can't impress upon you the fact enough times about how powerful this is. We don't really care about the container. That's the cool part. I don't need to worry about it. It could be implemented in a really, really complex way, doesn't matter. The <algorithm> library handles it for us.
+	std::cout << "\n========================" << std::endl;
+
+    std::string str1 {"This is a test"};
+    std::cout << "Before transform: " << str1 << std::endl;
+    std::transform(str1.begin(), str1.end(), str1.begin(), ::toupper);
+    std::cout << "After transform: " << str1 << std::endl;
+
+So the last example is about string transform. This is pretty cool. There's an algorithm called std::transform() and it works not just with strings, it works with containers obviously. But it's used very often with strings. Let me show you what it does and this is where that toupper() function comes in. So here I've got a std::string 'str1' and it's initialized to "This is a test". All I'm doing is I'm displaying the string before the transform. So that's just going to display "This is a test". Then I'm going to call the std::transform() function, I'm going to tell it where to start[i.e., str1.begin()], where to end[i.e., str1.end()], in other words, it's processing the entire string. And then where to start placing its results, again at the beginning of the string. And what do I want to do. Well, I want to make each character toupper and I can pass my own function in here but we already have the toupper() function defined in <cctype> header file. Whenever you put that scope resolution operator in the front of something with nothing in the beginning, just :: followed by something else, that means global scope and that's what going on here. So I'm using the toupper() function actually that's in the global scope. So what do you think this[i.e., toupper()] does, it makes every single character in that string uppercase. Super powerful. We can process strings. 
+
+It's crucial to include <cctype> to use ::toupper. The double colon :: specifies that you're calling the global namespace version of toupper, which is originally from the C standard library. If you don't use ::, and only use toupper, it could lead to errors due to potential conflicts with the std::toupper overload which has multiple definitions.

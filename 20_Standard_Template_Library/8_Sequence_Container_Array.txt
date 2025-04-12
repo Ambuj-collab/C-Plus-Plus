@@ -1,0 +1,37 @@
+I'd like to go over one of the most basic of the STL containers, the std::array container. I'll call it std::array in this video, so we don't confuse it with a raw array. In order to use the std::array container, we must include the <array> header file. The std::array container allows us to create fixed size arrays of any type. So what makes it different from a raw array, a lot. First, it's an object type. std::array always has its size associated with it. Unlike a raw array, a std::array doesn't decay to a pointer to the first element of the array when we pass it into a function. It's also very efficient. Element access happens in constant time. Constant time means that the time it takes to access an element is independent of the number of elements in the container. So if std::array has 5 elements and you wanted to access one of them, the time required would be the same as if it had 100000 elements. Also since a std::array is implemented, behind the scenes by the STL, as a wrapper class around a raw array, we can get access to that raw array address if we need to and we can use it with libraries that use raw pointers. But the biggest benefit is that it's part of the STL, so we can use it with iterators and algorithms. The std::array class wasn't part of the original STL. It was added in c++11. You should always first consider using std::array in modern c++ when you have a need for a fixed size array. Don't use raw arrays unless you have a compelling reason to do so. All of the STL iterators are available with std::array and they don't invalidate. In other words, we can't have the invalidate iterator with std::array and that makes sense because std::array is a fixed size structure.
+
+So first, let's look at a few ways to initialize std::array and then we'll see some of the common member methods. std::array is a very simple template class. Since the size of the array must be known at compile time, we have to provide both the type we want to store in it as well as the size. This is exactly what we did a few videos ago when we created our own My_Array class.
+	std::array<int, 5> arr1 { {1,2,3,4,5} }; 	// If you are using C++11
+	std::array<int, 5> arr1 {1,2,3,4,5};		// If you are using C++14
+
+In the example above, I declared 'arr1' as a std::array of 5 integers and I initialize these 5 integers to 1, 2, 3, 4 and 5. If we have more than 5 integers in the initializer list, we'll get an error. If we have fewer than 5, the remaining integers omitted will be set to 0. Now there is a quark with the initializer list. In c++11, you need to provide double curly braces. In c++14 and forward you don't, just a single curly brace.
+	std::array<std::string, 3> stooges {
+		std::string("Larry"},
+		"Moe",
+		std::string("Curly"}
+	};
+
+So in the example above, I'm declaring 'stooges' as a std::array of 3 strings and I'm initializing them to "Larry", "Moe" and "Curly". Note that I can use c-style string literals and they'll be converted to std::string.
+	arr1 = {2,4,6,8,10};
+
+There's also a very handy way to assign multiple values to an existing std::array, as shown above. We can use an assignment statement and an initializer list. This is really cool and extremely useful.
+
+So now let's see some common methods provided by std::array. Here, I'm not going to exhaustively go over all the methods provided by all of the STL containers. That would be pretty boring for me and it would probably be even more boring for you. So what I want to do is I'll go over some of the most common methods used and some of the methods particular to specific containers.
+	std::array<int, 5> arr {1,2,3,4,5};
+	
+	std::cout << arr.size();		// 5
+	std::cout << arr.at(0);		// 1
+	std::cout << arr[1];			// 2
+	std::cout << arr.front();		// 1
+	std::cout << arr.back();		// 5
+
+So let's start with the size() method. This method is available to all containers. In the std::array, it's pretty simple. It's the size of the container and it's fixed. Arrays also let us access individual array elements. We can use either the subscript syntax or the at() method. Now if you remember from the vector, subscript operator does no bounds checking but the at() method does do bounds checking and an exception is thrown if we're out of bounds. The std::array also provides front() and back() methods. Now, these methods return references to the element at the front of the array and to the element at the back of the array, respectively. 
+	std::array<int, 5> arr {1,2,3,4,5};
+	std::array<int, 5> arr1 {10,20,30,40,50};
+	
+	std::cout << arr.empty();		// 0 (false)
+	std::cout << arr.max_size();	// 5
+	arr.swap(arr1);		 	 // swaps the 2 arrays
+	int *data = arr.data();	 // get raw array address
+
+The empty() method will return true if the std::array is empty and false otherwise. The max_size() method returns the maximum number of elements that the array container can hold.	For std::array, both size() and max_size() return the same value, which is the fixed size of the array, determined at compile time. The size() function returns the number of elements currently stored in the array, while max_size() returns the maximum number of elements the array can hold. Since std::array has a fixed size, these values are always equal. For other containers like std::vector, size() and max_size() can differ. size() returns the current number of elements in the container, while max_size() returns the maximum number of elements the container can hold due to system or library implementation limitations. We can also swap the elements of two std::array of the same size and type. All we have to do is simply call swap() on one std::array object and pass in the other one. And finally, we can use the data() method to get access to the underlying raw array. In this case, data() method returns the address of the raw array of integers which we are storing in a pointer variable.

@@ -1,0 +1,10 @@
+We'll learn about the queue. The queue is a first-in, first-out data structure. Like the stack, the queue is an adapter class because it's implemented in terms of already existing STL containers. Since operations on the queue happen on both ends, the front and the back, we can easily implement a queue based on any container that has the front and the back. These are the list and the deque. So, the queue class methods use delegation and call the methods of the underlying container. Like stack, queue has wide applications in computer science and the STL provides a simple concise implementation. You can think of a queue as a waiting line, elements enter on one end and are removed from the other. Like stack, iterators really don't make sense with queue and they're not supported. So, we can't use the STL algorithms either.
+
+In order to use the queue container, we must include the <queue> header file. Like the stack, the queue provides a handful of methods that have very well-defined behavior. The push() method inserts an element at the back of the queue. The pop() method removes an element from the front of the queue. The front() and back() methods access the front and back elements of the queue but does not remove them. Finally, we have the empty() and size() methods that we've seen with the other containers.
+	std::queue<int> q;		// deque
+
+	std::queue<int, std::list<int>> q2;		// list
+
+	std::queue<int, std::deque<int>> q3;		/ / deque
+
+Since the queue is an adapter class, we can choose what underlying container will be used. Same thing we did with the stack. In the first example above, I'm providing no information about the underlying container, so the STL will use a deque by default. You can see in the next two examples that I'm explicitly stating which underlying container to use as the template parameter.

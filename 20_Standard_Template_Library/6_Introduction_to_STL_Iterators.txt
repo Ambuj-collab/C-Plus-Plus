@@ -1,0 +1,100 @@
+I'd like to go over the basics of iterators in the standard template library. Iterators allow us to think of a container as a sequence of elements, it doesn't matter what the container is. For example, we might have a vector or a set or a map, they're all very different containers. But iterators allow us to process sequence of elements from these containers without worrying or even needing to know about how the container is implemented behind the scenes. That gives us so much power. Iterators are implemented as template classes, so we create iterator objects and use them to iterate through our containers. The syntax we use with iterators will remind you of pointers. We can use the dereference operator, the increment and decrement operators and so forth. This was done intentionally. C++ programmers are comfortable with the pointer syntax, and it's very easy to learn how to use iterators without having to learn some other arbitrary syntax. Most of the STL containers can be traversed with iterators. There are a few exceptions, such as a stack and a queue, and we'll see them later.
+	container_type::iterator_type iterator_name;
+
+So how do iterators look like and how do we use them. An iterator must be declared based on the container type that it will iterate over. So if I have a vector of integers, then my iterator must know that when I create it. The syntax is very straightforward. as shown above. We provide the container type, the scope resolution operator, the iterator type, and then the name of our iterator object. I know that sounds complicated, but it's not. 
+	std::vector<int>::iterator it1;
+	std::list<std::string>::iterator it2;
+	std::map<std::string, std::string>::iterator it3;
+	std::set<char>::iterator it4;
+
+Let's see some examples. In the above declarations, I'm declaring four iterator objects. The first, it1, is an iterator that will iterate over a vector of integers. It can only be used on vectors of integers. The second, it2, can iterate over a list of strings. A list is a container in the STL which we'll see later in this section. The third, it3, can iterate over a map of string-string pairs. Maps are like dictionaries, we'll also see them later in this section. Finally, it4 is an iterator that can iterate over sets of characters. As you can see, we must be very specific when declaring iterators.
+	std::vector<int> vec {1,2,3};
+
+Now let's look at an example using a vector, so we can see how to initialize iterators. In this example, we've created a vector of integers named 'vec' and initialized it with 1, 2 and 3. Remember, a vector is a container in the STL that stores elements in contiguous memory and can resize itself to accommodate elements dynamically. How vector is implemented in the STL doesn't really matter to us. What we do need to know is that a container has a beginning and an end. The STL defines the beginning as the first element in the container, in this case, the 1. And the STL defines the end as one after the last element in the container. This is very important, and it's consistent throughout the STL. The end is not the last element, it's one after the last element. Almost all of the STL containers have 'begin' and 'end' methods. When we call these methods, they return an iterator object that's pointing to either the first element in the container or one past the last element in the container. In this case, vec.begin() will return an iterator that's pointing to the element 1 and vec.end() will return an iterator pointing one past the element 3 in this case. When we write code, we use vec.end() as the sentinel so that we know when we're at the end of the list.
+	std::set<char> suits {'C' , 'H' , 'S' , 'D'};
+
+Now suppose we have a set, as shown above. A set may or may not be implemented in contiguous memory, it doesn't matter and that's the point. We don't need to know that. If we want to iterate over a set of characters named 'suits', in this case. We know that suits.begin() will return an iterator to the first element in the set and suits.end() will return an iterator one past the last element in the set.
+	std::vector<int> vec {1,2,3};
+	std::vector<int>::iterator itr = vec.begin();
+		or
+	auto itr = vec.begin();
+
+We can use this information to initialize our iterators. For example, we can declare an iterator named 'itr' that will iterate over a vector of integers and then initialize 'itr' to point to the first element in that vector. We do that by calling vec.begin(). In this case, 'itr' will point to the element 1 in the vector. If the vector had been empty, then it would point to vec.end(). Now the syntax can get long when we do this(i.e., ). So we can use 'auto' to let the compiler deduce the type of the iterator, this is really handy and it's used very often. So the compiler deduces the type of 'itr' as an iterator to a vector of integers based on the result returned by vec.begin(). This is much more readable, much more writable and easier to debug.
+
+There are a bunch of operations that we can use on iterators. Most will feel very similar to using pointers. In this table(see page number 795 of LPA-Beginning-C++-Programming-From-Beginner-to-Beyond-SEP2024.pdf), we have a few of the most commonly used operations on iterators. The first column is the operation, the second column explains what it does, and the third column shows what type of iterator supports this operation. In this table, we'll assume that 'it' is an iterator and 'i' is an integer.
+	i) ++it, it++  ==> Notice the first two iterator operations, pre-increment and post-increment. When we increment an iterator, we're asking it to point to the next element in the container. How's that determined, it's up to the container we're using. These operations are supported by all iterators.
+	
+	ii) it = it1  ==> The third operation is assigning one iterator to another. Ofcourse, the type of the iterators must be the same. This operation is supported by all iterators.
+	
+	iii) *it, it->  ==> The fourth operator is the dereference operator, just like when we dereference a pointer. When we dereference an iterator, we get the element in the container that it's pointing to. And we can also use the arrow operator when we're pointing to objects and we want to access their attributes and methods. Both input and output iterators support this, and we're able to read and write elements to containers.
+
+For the rest of the operators, you can look at them on your own. Notice that we have ways to compare iterators and we can also decrement iterators. Some containers support bi-directional iterators which means that we can move forward and backwards through the container, others(like arrays and vectors) support random access iterators. A Random-access iterator can be compared for equality with another iterator. Since, iterators point to some location, so the two iterators will be equal only when they point to the same position, otherwise not.
+	std::vector<int> vec{1,2,3};
+	std::vector<int>::iterator itr = vec.begin();
+	while(itr != vec.end()) {
+		std::cout << *itr << " ";
+		++itr;
+	}
+
+Output: 1 2 3
+
+So how can we use these operators to work with iterators. Above is a really simple but common example. First, we declare 'vec' as a vector of integers and we'll initialize it with 1, 2 and 3. What we want to do is use an iterator to iterate over the vector and display the contents of that vector. So we declare our iterator 'itr' as an iterator over a vector of integers and we initialize it to the first element of 'vec' by calling vec.begin(). Now we simply iterate through the vector while it is not equal to vec.end() and at each iteration, we display the element the iterator is pointing to by dereferencing the iterator, then we move to the next element by incrementing the iterator. That's it. I know what you're thinking, why not just use a range-based for loop or a counter controlled for loop? We absolutely could and we often do. We'll see in a bit that a range based for loop is converted to an iterator-based loop behind the scenes by the compiler. But the real answer is that, in the case of a vector, we could do it a lot of different ways. But other containers don't allow us to randomly access elements like a vector does. So for those containers, iterators are necessary.
+	std::vector<int> vec{1,2,3};
+	for (auto itr = vec.begin(); itr != vec.end(); itr++) {
+		std::cout << *itr << " ";
+	}
+
+Output: 1 2 3
+
+We can achieve the same result with a for loop instead of a while loop, as shown above. Here we declare 'itr' using auto. This makes the code much more readable. We start at vec.begin(). We loop while 'itr' is not equal to vec.end(), and we display the element by dereferencing the iterator. Then we increment the iterator and do it all over again. This is exactly how range-based for loop works. In fact, sometimes we might mess up the code in a range based for loop that iterates over a container and the compiler gives us an error message saying that something is wrong with the iterator. This error is really confusing to beginning students but no more. If you ever get an error like that, you'll know exactly what's going on.
+	std::set<char> suits {'C', 'H', 'S', 'D'};
+	auto itr = suits.begin();
+	while(itr != suits.end()) {
+		std::cout << *itr << " " << std::end;
+		++itr;
+	}
+
+Output: C H S D
+
+Now let's iterate over a set of characters using an iterator, as shown above. Here we define 'suits' to be a set of characters and we initialize it with the characters C, H, S and D. We can also declare our iterator 'itr' as auto and let the compiler deduce its type based on the result of suits.begin(). Then we loop while 'itr' is not equal to suits.end() and display the character. Increment the iterator and loop again. The pattern should look familiar.
+
+Finally, let's wrap up by looking at a reverse_iterator. A reverse_iterator is exactly what you would expect, it works in reverse. So the last element is the first and the first is the last. And when we increment the iterator, we move backward through the container in reverse. When we decrement the iterator, we move forward.
+	std::vector<int> vec{1,2,3};
+	std::vector<int>::reverse_iterator itr = vec.begin();
+	while(itr != vec.end()) {
+		std::cout << *itr << " ";
+		++itr;
+	}
+	
+			OR
+	
+	std::vector<int> vec{1,2,3};
+	auto itr = vec.rbegin();
+	while(itr != vec.rend()) {
+		std::cout << *itr << " ";
+		++itr;
+	}
+	
+Output: 3 2 1
+
+Above is the same example with 'vec' as a vector of the 3 integers: 1, 2 and 3. We then declare 'itr' as a reverse_iterator and initialize 'itr' to vec.begin(). Since it's a reverse_iterator, it will be pointing to the last element in the list, not the first. Now we can write code as we did before and this will display the vector elements in reverse, 3 2 1 in this case.
+
+In addition to the reverse_iterator, there's a few variants that are const_iterator, that are read-only iterators. All const_iterator is an iterator but I can't change what it's pointing to. It's constant. Let's take a look at those really quickly. So in this slide(see page 800 of LPA-Beginning-C++-Programming-From-Beginner-to-Beyond-SEP2024.pdf), we'll wrap up the iterators by learning about the const_iterator. Below are methods in the appropriate container class that return specific type of iterators. You can see that we used begin() and end() for regular iterator. We can also use cbegin() and cend() for const_iterator. rbegin() and rend() for reverse_iterator, as we saw above. crbegin() and crend() for const_reverse_iterator. 
+	. begin() and end()
+		· iterator
+
+	. cbegin() and cend()
+		· const_iterator
+
+	. rbegin() and rend()
+		· reverse_iterator
+
+	· crbegin() and crend()
+		. const_reverse_iterator
+
+Okay. So that's a basic introduction to the STL iterators. There's much, much more to learn, but this foundation will let you use iterators with containers and algorithms and solve a bunch of problems.
+
+The following 2 lines are equivalent:
+	std::vector<int>::const_iterator it1 = nums1.begin();
+			OR
+    auto it1 = nums1.cbegin();

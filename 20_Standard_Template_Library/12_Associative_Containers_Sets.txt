@@ -1,0 +1,70 @@
+We'll learn about the stl set containers. These are associative containers. Associative container is collection of stored objects that allow for fast retrieval using a key. The stl provides both set and map. In this video, we'll learn about set and we'll learn about map in the next video. Depending on the type of the associate container, they're usually implemented behind the scenes as a balanced binary tree, something like a red black tree or as a hash set. These are very efficient data structures. So operations on set and map are very fast. The stl has 4 types of set containers: the set, the unordered_set, the multiset and the unordered_multiset. We'll focus mainly on the set since it's the one most often used. But I'll also describe the others as well.
+
+Let's first talk about the set. In order to use a set, you must include the <set> header file. The set class is similar in concept to a mathematical set. The elements in the set are ordered by key and no duplicate elements are allowed. All iterators are available for set.
+	std::set<int> s{1,2,3,4,5};
+
+	std::set<std::string> stooges {
+		std::string{"Larry"},
+		"Moe",
+		std::string{"Curly"}
+	};
+
+	s = {2,4,6,8,10};
+
+Let's initialize a few set objects. In the first example above, I declare 's' as a set of integers and I initialize it with 1,2,3,4 and 5. In the second example, I declare 'stooges' as a set of std::string and I initialize it with some strings. Then at last, you can see that set also supports assignment via an initialization list.
+	std::set<int> s{4,1,1,3,3,2,5};		// 1 2 3 4 5
+	std::cout << s.size();		// 5
+	std::cout << s.max_size();	// a very large number
+	
+	s.insert(7);	// 1 2 3 4 5 7
+
+But there are some differences with set. On the first line above, I'm initializing 's' as a set of integers and I'm providing the initializer list, but notice that the initializer list contains duplicate elements. That's not allowed in a set. This won't cause an error though. The duplicates are simply ignored and we end up with a proper set. Also notice that the set is sorted. The size() method returns the number of elements that are in the set and max_size() tells us what the maximum number of elements a set can hold. Remember, set does not allow direct access to elements, so we can't use the subscript operator or the at() method as we have with other containers. Set also doesn't have a front and back. So methods like push_back(), pop_back(), push_front() and pop_front() does not apply to set. So how do we add elements to set. Simple, we use the set's insert() method. We can also use the emplace() method if we want. In the last statement above, we insert 7 into the set. If 7 is in the set, it won't be added again. If it's not in the set, then it will be added and it will be added in order.
+	Person p1{"Larry", 18};
+	Person p2{"Moe", 25};
+
+	std::set<Person> stooges;
+
+	stooges.insert(p1);			// adds p1 to the set
+	auto result = stooges.insert(p2);		// adds p2 to the set
+
+So let's talk a little bit more about the insert() method. Suppose I have an object 'p1', that's a Person object. I also have 'p2' as a Person object. We can insert 'p1' into the 'stooges' set by simply calling stooges.insert() and passing in 'p1'. If the element is not in the set, it will be added. Otherwise, it won't be added. The set class uses the overloaded less than operator to determine the ordering. Sometimes we want to know whether an element was inserted successfully or not. The insert() method returns a std::pair. Remember, we talked about std::pair a few times in this course and we'll talk about it some more times in the std::map video as well. The std::pair object that's returned has its first attribute as an iterator to the element that we just inserted or an iterator to the duplicate element that's already in the set and then the second attribute is a boolean that indicates whether the operation was successful or not. That's pretty cool. Now we have all the information we need and we can do whatever we need in our program.
+	std::set<int> s{1,2,3,4,5};
+
+	s.erase(3);		// erase the element 3 : 1 2 4 5
+
+	auto it = s.find(5);
+	if(it != s.end())
+		s.erase(it);		// erase the 5: 1 2 4
+
+We can also erase elements in a set very easily. S.erase 3 will erase the 3 in the set s if it exists. We can use the sets find method to find the 5. And if it exists, delete it by passing the iterator to the erase method. Notice that the sets find method is different from the find function in the stl algorithms library. You should use the sets find because the sets find knows all about the internal implementation of the set, and it's going to be much more efficient.
+	std::set<Person> stooges {
+        {"Larry", 1},
+        {"Moe", 2},
+        {"Curly", 3}
+    };
+	
+	auto it = stooges.find(Person{"Moe", 2});		// Will remove Moe!!!!
+    if (it != stooges.end())
+        stooges.erase(it);
+		
+	it = stooges.find(Person("XXXX", 50));      // Will remove James!!!!
+                                                // uses operator<
+    if (it != stooges.end())
+        stooges.erase(it);
+
+find() method of set class uses the overloaded less than operator of Person class to find the target object, unlike std::find() STL algorithm who uses overloaded equality operator. This gets a lot of people confusing when they are first starting out with the stl and a lot of these containers. Some of them use overloaded equality operator, some of them use overloaded less than operator to find. The set uses the overloaded less than operator. So be aware of that.
+	std::set<int> s{1,2,3,4,5};
+
+	int num = s.count(1);		// 0 or 1
+
+	s.clear(); 		// remove all elements
+
+	s.empty();		// true or false
+
+Finally, we can use the count() method to see how many times an element appears in a set. If you think about that, it doesn't make a lot of sense, right. I mean a set can only have an element in there once at most. But in this case, it's real handy to tell whether an element is in the set or not. If we get back 0, we know it's not in the set. If we get back 1, it is in the set. We're going to use this count() method in std::multiset because std::multiset can have duplicate elements, so this method is really useful there as well. Finally, as with all other stl containers, clear() method removes all of the elements from the set and empty() method returns true if the set is empty or false otherwise. Well, that's a quick summary of the set class. Please refer to the std::set documentation since there is more and many of the methods I showed you, have variants as well.
+
+So let's talk about the other set classes. First, let's talk about the multiset class. It's also defined in the <set> header file. A multiset is a set that's ordered by key but it allows duplicate elements. All iterators are available.
+
+The unordered_set is in the <unordered_set> header file. The unordered_set is a set that's unordered and it does not allow duplicate elements. Due to the way that unordered_set is implemented, elements can't be modified in place. If you need to change an element, you have to remove it and then insert the updated one. Also unordered_set does not allow reverse iterators.
+
+The last type of set provided by the stl is the unordered_multiset, defined in the <unordered_set> header file. The unordered_multiset does not order elements and it does allow duplicates. Again, no reverse iterators are allowed. As you can see, the stl provides powerful set classes for nearly every need, however, by far the most used is the set and that's the one we're going to focus on.

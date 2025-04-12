@@ -1,0 +1,17 @@
+We'll learn more about the priority_queue. The priority_queue is a container adapter just like the stack and the queue. The priority_queue allows insertion and removal of elements in order from the front of the container. Elements are stored internally in vector by default, but a data structure called the heap is used behind the scenes. Don't confuse heap data structure with the heap memory that we used to store dynamically allocated data in our program. They're totally different. Elements are inserted in priority order. So, the largest priority element will always be at the front of the priority_queue, that's pretty cool. We can insert elements in the priority_queue and when we get an element from the front, we're guaranteed that it will be the largest priority element in the container. It's super-efficient. Iterators make no sense with priority_queue, so they're not supported and neither are the STL algorithms.
+
+In order to use the priority_queue, we must include the <queue> header file. The priority_queue has just a couple of methods that are super powerful. The push() method is used to insert new elements into the priority queue. When an element is added using push(), it is placed in the appropriate position within the priority_queue based on its priority. By default, std::priority_queue uses std::less for comparison, resulting in a max-heap where the largest element has the highest priority. The pop() method removes the top priority element from the priority_queue and the top() method accesses the top priority element without removing it. The top element will always be the highest priority element which defaults to the element with the greatest value. Finally, we have the empty() and size() methods as we've seen before.
+	std::priority_queue<int> pq;	// vector
+
+	pq.push(10);
+	pq.push(20);
+	pq.push(3);
+	pq.push(4);
+
+	std::cout << pq.top();	// 20 (largest)
+	pq.pop();				// remove 20
+	std::cout << pq.top();		// 10 (largest)
+
+So, let's see a simple example of using the priority_queue as shown above. First, we create a priority_queue and we'll call it 'pq'. Behind the scenes, it's using the vector as the underlying container. Then we push four integers onto the priority_queue and then we display the top priority element with pq.top(). In this case, element 20 will be displayed because 20 was the largest element inserted into the priority_queue. We can remove the element from the top with pq.pop() and if we display the top again, we'll get 10 since 10 is the next largest integer that was added to the priority_queue. That's it, it's really very simple and very powerful.
+
+We use priority_queue all the time because they make a lot of sense and they're super-efficient. Let's say, we're doing operating systems and we're scheduling jobs, and they have to run based on a certain priority. This is awesome.

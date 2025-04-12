@@ -1,0 +1,207 @@
+We've seen how we can write generic functions using c++ templates. In this video, we'll take it a step further and we'll learn how we can use c++ templates to create generic classes. So what is the c++ class template. A class template is similar to a function template but instead of creating a generic function, we'll be creating a generic class. So this implies generic attributes, constructors, destructors, methods and so forth. Just like we can plug-in any type to a function template, we can do the same with a class template. We've already used class templates in several places in this course, the most obvious is when we created vector objects. We didn't just say I want a vector, we said I want a vector of a specific type, and that's where the class templates come in. So the class template is a generic blueprint that the compiler uses to create specialized classes. That's what meta-programming is all about. As I mentioned in the previous slides, templates can be very complex. Class templates, in particular, can be very complex. Imagine combining inheritance, dynamic polymorphism, operator overloading, templates and other advanced c++ features together, super powerful but also complex.
+	class Item {
+	private:
+		std::string name;
+		int value;
+	public:
+		Item(std::string name, int value)
+			: name{name}, value{value}
+		{}
+		std::string get_name() const {return name; }
+		int get_value() const { return value; }
+	};
+	
+So let's see how we can use class templates. Let's say we want a class that will hold an integer and a string, and we want that class to be called 'Item'. We can write a simple class as follows. Note that we have 2 private attributes, 'name' and 'value'. A constructor that initializes those attributes with values provided by the user and we have a get name and get value getter methods. Of course, we could add other methods, but we won't in this example since the purpose is to focus on how we can make this class generic. So let's suppose that now we need a class that's similar to the Item class, except instead of an int and a string, we want to model a double and a string. What can we do? Sure, we can create a new class, just like we did for Item that has a double and a string. But we'd have to name it something other than Item since we can't overload class names in the same namespace. And we don't want to create a complex hierarchy with dynamic polymorphism. So let's see how we can use c++ class templates to allow us to just write the blueprint for the class.
+	class Item {
+	private:
+		std::string name;
+		T value;
+	public:
+		Item(std::string name, T value)
+			: name{name}, value{value}
+		{}
+		std::string get_name() const { return name; }
+		T get_value() const { return value; }
+	};
+
+First, we can replace the type of the 'value' attribute from int to T in this case. But remember, this(i.e., T) can be any name. Then we go through the class and wherever we used 'value' or return value's type, we replace it with a T. That's pretty much it. Now, ofcourse, this won't compile.
+	template <typename T>
+	class Item {
+	private:
+		std::string name;
+		T value;
+	public:
+		Item(std::string name, T value)
+			: name{name}, value{value}
+		{}
+		std::string get_name() const {return name; }
+		T get_value() const { return value; }
+	};
+
+We need to tell the compiler that this is a template class and we can do this by adding the template declaration before the class declaration and provide the template parameter. This is a pretty simple example but it makes sure the Item class is much more generic and much more useful.
+	Item<int> item1 {"Larry", 1};
+	Item<double> item2 {"House", 1000.0};
+	Item<std::string> item3 {"Frank", "Boss"} ;
+	std::vector<Item<int>> vec;
+
+Now if we want to create instances of Item, we can simply provide the type of the 'value' attribute in the template parameter and the compiler will take care of generating the correct class from the template. In the first example, we're creating item1 as an Item with a 'value' attribute of type 'int' and a 'name' attribute of type string. 'name' attribute will always be of type string, so we don't have to provide it as the template parameter. In the second example, 'value' attribute will be of type double. In the third example, 'value' attribute will be a std::string. And in the final example, we're creating a vector that holds Items, and those Items will have 'value' attribute as an integer. That's it.
+	template <typename T1, typename T2>
+	struct My_Pair {
+		T1 first;
+		T2 second;
+	};
+
+Just as with function templates, there's no limit to the number of template parameters you can have. And ofcourse, they may be of different types. In this example, we're creating a class template called My_Pair that models a pair of data items. The types of these data items can be different if we wish or they can be the same. Note that in this case, we use a struct since all we want to do is associate 'first' with 'second'. We're just modeling data, so we won't need to bother about constructors, methods and so forth.
+	My_Pair <std::string, int> pl {"Frank", 100};
+	My_Pair <int, double> p2 {124, 13.6};
+	std::vector<My_Pair<int, double>> vec;
+
+Now if we wanted to create My_Pair objects, it's really easy. In the first example, we create p1 as a My_Pair of std::string and integer, and we initialized it to "Frank" and 100. In the second example, we create p2 as a My_Pair of integer and double. And we initialize it to 124 and 13.6. And in the last example, we create a vector that holds My_Pair objects, and those objects are int-double pairs. This My_Pair class can be a very handy class since it can associate any 2 pieces of data of any type. In fact, it's so useful that it's already defined for us in std::pair. We need to include the 'utility' header file and then we can use the std::pair class which has been implemented very much like the way we implemented My_Pair. In addition to the std::pair template class, c++ also has a template class named tuple. It allows you to associate more than 2 pieces of data of any type. It's not just limited to 2 items, like the pair class.
+	// Initializing tuple
+    tuple<char, int, float> geek(20, 'g', 17.5);
+	
+Template classes are typically completely contained in header files. So we would have the Item template class in Item.h file and there would be no Item.cpp file associated with it. Now that makes sense because what we have is a blueprint. The compiler is not compiling this blueprint, it's basically using it to create a specialized version of it that will be compiled. So it's important, if you start putting stuff in .cpp files, you're going to get run into all kinds of issues. There are ways to get it to work, but they're beyond the scope of this course. So for this course, put all your template classes in their own .h file.
+
+
+Creating a Generic Array Template Class:
+============================================
+	class Array {
+		int size {N};           // how do we get the N???
+		int values[N];        // the N needs to be known at compile-time!
+
+		friend std::ostream &operator<<(std::ostream &os, const Array &arr) {
+			os << "[ ";
+			for (const auto &val: arr.values)
+				os << val << " ";
+			os << "]" << std::endl;
+			return os;
+		}
+	public:
+		Array() = default;
+		Array(int init_val) {
+			for (auto &item: values)
+				item = init_val;
+		}
+		void fill(int val) {
+			for (auto &item: values )
+				item = val;
+		}
+		int get_size() const {
+			return size;
+		}
+		// overloaded subscript operator for easy use
+		int &operator[](int index) {
+			return values[index];
+		}
+	};
+
+I'd like to implement a class template for an Array class. Now this is going to be a little bit more complicated than anything we've done before, but I'm sure you'll be able to follow along if you've been following along with the course. Now I've started this a little bit already, as shown above. And the idea here is we'd like to create an Array class. Okay, not a raw array and not a dynamic array, just a class Array. And eventually, we want it to be of any size and of any type, That'd be pretty cool. And we want this to be a fixed size array. And basically, it would be a replacement for using a raw array. C++ already has this for us. In c++11, we have an Array class in the standard template library, and I'll talk about that in a couple of videos. But let's see how we could implement the beginnings of that so that we can really learn from it. So, we want to have an Array of something, right. Well, in this case, let's just stick to integers and then later on what we'll do is we'll make this generic. The Array is a fixed size and that fixed size is N. None of this will compile yet, but I just want to get this point across here. The question is how do we get this N? Well, the user knows how big the Array needs to be. Let's say, it's 10 integers or 20 integers or 100 integers. They could pass that in through a constructor argument, right. The problem with that is that the compiler needs to know what the value of N is, in order to create this Array. 
+	int* arr = new int[size];
+
+Now we're not doing something like using a pointer and creating a new array of integers as shown above, like we did before, we're not doing that for the 'values' array. That's not what I want to do. I want to create it on the stack. So the compiler needs to know the value of that N and it can't know that if we pass it into a constructor argument because it is used for initializing object. 
+	Array arr;
+
+So one of the first things we want to do is figure out how to do this. So I want to be able to create an Array class. And let me show you the way I want to do it. I want to do something like this, as shown above. I want to be able to say give me an Array, let's say it's arr, right now it's an array of integers by default as you can see the above class declaration, and I'll just do that. Now that's not good enough because there's no size information. But if I can do something below, that's pretty cool. So I can pass in the size of the array as a template parameter.
+	Array<5> arr;
+
+Well, how do we do that. Everything we've seen so far has been type template parameters, right. Well, it's possible to have non-type template parameters. And let me show you how that works. And basically what we're doing here is we just have a regular Array class, it's got some constructors, a default constructor, it's also got a constructor with an initial value. So what we're doing here(parameterized constructor) is just setting all the values of the array to that passed value. I've got a method called 'fill', which will just change all those array elements to whatever value is passed in here. Then I've got a couple of more methods that I'll talk about in a little bit. So first thing first. Let's make this Array class a template class. So what we can do is we can come up here(i.e., just above the class declaration), and we could say template. And now we've got our template parameters here, right. Now we do here. We're not passing in a type. We'll do that later when we make this a generic class but what we want here is the size of the array. So we can supply N right there as a template parameter. 
+	template <int N>
+	class Array {
+		int size {N};           // how do we get the N???
+		int values[N];        // the N needs to be known at compile-time!
+
+		friend std::ostream &operator<<(std::ostream &os, const Array<N> &arr) {
+			os << "[ ";
+			for (const auto &val: arr.values)
+				os << val << " ";
+			os << "]" << std::endl;
+			return os;
+		}
+	public:
+		Array() = default;
+		Array(int init_val) {
+			for (auto &item: values)
+				item = init_val;
+		}
+		void fill(int val) {
+			for (auto &item: values )
+				item = val;
+		}
+		int get_size() const {
+			return size;
+		}
+		// overloaded subscript operator for easy use
+		int &operator[](int index) {
+			return values[index];
+		}
+	};
+
+Now when I use the syntax to create Array class object that I used earlier I've got my N. Now that's pretty cool. So that's how we get the N. The user provides the N at compile time. Now the compiler can actually create that Array. Now we've got a friend function here that's just used to display the Array. And in this case here, it needs to know what that N is. So I'm just going to put an N right in here, as shown above. So it needs that template parameter. There might be a couple of new things that you haven't seen before inside the Array class. This one here, I don't know if we ever overloaded the subscript operator(i.e., []), but we're doing it right here so that we can use it as array indexing and all we're doing is returning a reference, so that we're able to change it as well.
+	Array<5> nums;
+	std::cout << "The size of nums is: "<< nums.get_size() << std::endl;
+    std::cout << nums << std::endl;
+
+So now let's see how we can actually use this Array class. Above is a couple of examples. Take a look at how useful this Array is. Here I'm creating an Array object of 5 integers. These are all integers right now because I haven't made it generic yet. So I have an Array object of 5 integers and I can display what's the Array size is, it should display 5. And then we are displaying the the integers because I've overloaded the insertion operator(i.e., <<).
+	nums.fill(0);
+    std::cout << "The size of nums is: "<< nums.get_size() << std::endl;
+    std::cout << nums << std::endl;
+    
+    nums.fill(10);
+    std::cout << nums << std::endl;
+
+I can also fill the Array to 0s. I can fill it to 10s, and display it again.
+    nums[0] = 1000;
+    nums[3] = 2000;
+    std::cout << nums << std::endl;
+
+And this is where(i.e., above) the overloaded subscript operator comes in, so I can specifically set and remember, what's going to happen here is it's going to call nums.operator[](0). So that's what being called and I'm just setting those values in this case. If this(i.e., nums[0]) is on the left side, we're using as an l-value and if it's on the right side, we're using as an r-value. So that's it. Now we've got a pretty powerful little Array class here that allow us to create an array of any size but only of integers. So let's take this to the next step and make it totally generic, which is really where we want to go. Since c++11, the STL has been around before c++11, but in c++11, we have std::array. This is a template-based array class. The idea here is in modern c++, we really shouldn't be using raw arrays. We should be using std::array and std::vector. Now the vector is great, right, but the vector can shrink and it can grow, it varies in size depending on what you need, that's one of the great things about the vector, you don't have to worry about that. But sometimes you know exactly what you have. You know that you have 10 integers, you have 20 integers or 5 strings and the vector might be overkill, and it could be a little less efficient. In a case like that, you really want to use std::array. It's much more efficient. It's not going to shrink, it's not going to grow. It's exactly that fixed size and sometimes that's exactly what we need. If we've got 12 months in the year, that's not going to grow, right. So it's a good example of using a std::array.
+	template <typename T, int N>
+	class Array {
+		int size {N};           // how do we get the N???
+		T values[N];        // the N needs to ne known at compile-time!
+
+		friend std::ostream &operator<<(std::ostream &os, const Array<T, N> &arr) {
+			os << "[ ";
+			for (const auto &val: arr.values)
+				os << val << " ";
+			os << "]" << std::endl;
+			return os;
+		}
+	public:
+		Array() = default;
+		Array(T init_val) {
+			for (auto &item: values)
+				item = init_val;
+		}
+		void fill(T val) {
+			for (auto &item: values )
+				item = val;
+		}
+		int get_size() const {
+			return size;
+		}
+		// overloaded subscript operator for easy use
+		T &operator[](int index) {
+			return values[index];
+		}
+	};
+	
+Now let's make this template class generic. So what do we have to do? It's really all about this guy(i.e., values attribute) right here. It's not about size attribute. size attribute is always going to be an integer, probably even better if we made that a size_t type since it's going to be an unsigned integer, but we'll just leave it for now. values attribute is the one that's going to change. It's not just going to be integers. It could be anything. So that's where we want to replace our placeholder T.
+	Array<int, 5> nums;
+    std::cout << "The size of nums is: "<< nums.get_size() << std::endl;
+    std::cout << nums << std::endl;
+    
+    nums.fill(0);
+    std::cout << "The size of nums is: "<< nums.get_size() << std::endl;
+    std::cout << nums << std::endl;
+    
+    nums.fill(10);
+    std::cout << nums << std::endl;
+
+    nums[0] = 1000;
+    nums[3] = 2000;
+    std::cout << nums << std::endl;
+    
+    Array<int, 100> nums2 {1};
+    std::cout << "The size of nums2 is: "<< nums2.get_size() << std::endl;
+    std::cout << nums2 << std::endl;

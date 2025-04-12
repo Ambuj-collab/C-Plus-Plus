@@ -1,0 +1,48 @@
+We'll learn more about the STL deque container. In order to use the deque, we must include the <deque> header file. The deque acts like a double-ended queue. The deque size is dynamic and it's handled by the STL, so that's very much like a vector. But unlike a vector, the elements in the deque are not stored in contiguous memory. The deque allows direct element access using the subscript operator and the at() method. But unlike a vector that allows efficient insertion and deletion only at the back, the deque allows efficient insertion and deletion at the back and at the front. However, inserting elements into any other part of the deque other than the front or back is not as efficient. The deque supports all of the iterators and the iterators may become invalid especially when the deque changes size.
+	std::deque<int> d{1,2,3,4,5};
+	std::deque<int> d1(10,100);		// ten 100s
+
+	std::deque<std::string> stooges {
+		std::string{"Larry"},
+		"Moe",
+		std::string{"Curly"}
+	};
+
+	d = {2,4,6,8,10};
+
+Let's first look at a few ways to initialize deque and then we'll see some of its member methods. In the first example above, I declared 'd' as a deque of integers and initialized it with 1,2,3,4 and 5. In the second example, I declared 'd1' as a deque of integers and I'm using an overloaded parameterized constructor to create a deque of 10 integers and initialize them all to 100. Ofcourse, like all the STL containers, the deque supports copy and move semantics for initialization and assignment. In the third example, I'm declaring 'stooges' as a deque of std::string and I'm initializing it with "Larry", "Moe" and "Curly". Now notice that "Moe" is a c-style string. Like vector and std::array, deques also support assignment via initializer list.
+	std::deque<int> d{1,2,3};
+	d.push_back(4);
+	d.push_front(10);
+
+So let's see some common methods provided by the deque container. We declare 'd' as a deque of integers and we initialize it with 1,2 and 3. The deque has a front and a back. The front in this case is the element 1 and the back is element 3. With the deque, we can efficiently add elements and remove elements from both the front and the back. In a deque, the push_back() method works very much as it does in a vector. The element to be added is pushed at the back of the deque. The push_front() method adds the element to be inserted at the front of the deque.
+
+Now let's see how the elements in the deque might be stored in memory(see page number 827 of LPA-Beginning-C++-Programming-From-Beginner-to-Beyond-SEP2024.pdf). Remember, the deque's elements are not stored in contiguous memory. So usually a deque is implemented as a collection of memory blocks and these memory blocks contain elements that are in a contiguous memory but the blocks themselves are not in contiguous memory. So a good way to think of a deque is as a linked list of vectors. So when we add an element at the front, it adds it if there's space. If not, it will allocate a new block, add the element to that block and then link in the blocks. The same happens when we add an element at the back. 
+	std::deque<int> d{1,2,3,4,5};
+
+	std::cout << d.size();	// 5
+	std::cout << d.max_size();	// a very large number
+
+	std::cout << d.at(0);		//1
+	std::cout << d[1];			// 2
+
+	std::cout << d.front();		// 1	
+	std::cout << d.back();		// 5
+
+Again, please refer to the c++ STL documentation for details on all of the methods for the deque. There's a lot there and that's the place to go to. The documentation is your friend. Don't think programmers keep all these details in our heads, we don't. We refer to the c++ docs very often. Generally, it's open on a second monitor. It's the same for java programmers. Usually, they've got the java docs open in a second monitor. And that's where all the good information is. Let's start with the size() method, this method returns the number of elements that are in the deque. We've already seen max_size() method with vectors and std::array, it's a pretty big number that just says how many elements can I store. Deques also allow individual access using either the subscript operator or the at() method and the rules are the same here. If you use the subscript operator, no bounds checking is done. But if you use the at() method, bounds checking will happen and an exception will be thrown if you're out of bounds. Above, you can see that I'm using d.at(0), that refers to the element 1 in the deque 'd' and d[1] refers to the element 2. But we don't often do this with a deque. Remember, the whole point of a deque is to be a doubly ended queue. So you're going to work on the front and you're going to work at the back. That's the idea. But it lets you have random access to the elements within it at constant time, which is cool. The deque also provides front() and back() methods that return references to the element at the front of the deque and at the back of the deque. So in this example, d.front() refers to the element 1 and d.back() refers to the element 5.
+	Person p1 {"Larry", 18};
+	std::deque<Person> d;
+
+	d.push_back(p1);	// add p1 to the back
+	d.pop_back();		// remove p1 from the back
+
+	d.push_front(Person{"Larry", 18}) ;
+	d.pop_front();		// remove element from the front
+
+	d.emplace_back("Larry", 18);	// add to back efficient !!
+	d.emplace_front("Moe", 24);		// add to front
+
+As I previously mentioned, the deque allows for efficiently inserting and removing elements at the front and at the back. Inserting is done with the push_back() method and the push_front() method. We also have a pop_back() and a pop_front() methods which remove element from the back and the front. Above, we have a deque of Person objects and called it 'd'. We can create a Person 'p1' named "Larry" who is 18 years old and we can use the push_back() method to insert 'p1' at the back of the deque. We can also remove it using pop_back(). Similarly, we can add a Person object to the front of the deque with push_front() and remove it with pop_front(). Remember, all container classes make copies of the elements they store. The deque container also supports emplace_front() and emplace_back(), which are super efficient ways to create and initialize objects, and store them in the deque right in place. 
+
+We're not really going to be inserting things into the middle of it. If you need to do that kind of thing, you probably better to using a list. We'll talk about the list container later. So I'm not going to go into any of the fancy stuff where you can insert things into the middle of a deque. I'm just going to keep it really simple because that's usually the way we use a deque.
+

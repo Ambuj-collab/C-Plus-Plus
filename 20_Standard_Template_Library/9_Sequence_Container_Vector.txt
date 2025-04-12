@@ -1,0 +1,60 @@
+We'll learn more about the STL vector container. We already know a lot about it since we've been using it since very early in the course. As you know, in order to use the vector container, you have to include the <vector> header file. The vector is probably the main workhorse of the STL. It's used in a lot of applications. The vector allows us to create dynamically sized arrays. The cool thing is that the vector can expand and contract as needed and it's handled automatically by the STL, we don't have to worry about the details but the vector does give us some control as to how it can grow. The vector elements themselves are stored in contiguous memory. So as the vector expands, a new larger area in memory is allocated and the current elements are moved to it. Like the std::array, the vector provides fast and direct access in constant time. It also allows for rapid insertion and deletion at the back of the vector in constant time. However, inserting elements into any other part of the vector other than the back is not as efficient. It happens in linear time which means that the running time increases linearly with the size of the vector. The vector supports all of the iterators and the iterators may become invalid. This is especially true when the vector resizes and a new area in memory is allocated for the extra storage.
+	std::vector<int> vec {1,2,3};
+	vec.push_back(4);
+
+We declare 'vec' as a vector of integers and initialize it with 1, 2 and 3. The vector has a front and a back. The front in this case is element 1 and the back is element 3. We typically add elements to the back of the vector using the push_back() method. So in this case, we're adding the element 4 using push_back() and 4 is added to the back of the vector. We can add elements anywhere in the vector but the back is the location where the addition of elements is most efficient. If there's no room and the vector needs to allocate more space, it will allocate automatically. Usually, twice the amount of the current space is allocated and the current elements are moved over to the newly allocated area and then the new element is placed at the back.
+	std::vector<int> vec1 (10,100); 	// ten 100s
+
+	std::vector<std::string> stooges {
+		std::string{"Larry"},
+		"Moe",
+		std::string{"Curly"}
+	};
+
+	vec1 = {2,4,6,8,10};
+
+In the above examples, first I declare 'vec1' as a vector of integers and I'm using an overloaded constructor here to create 10 integers and initialize them all to 100. Ofcourse, the vector supports copy and move semantics for initialization and assignment. In the second example, I'm declaring 'stooges' as a vector of std::string and I'm initializing 'stooges' with both std::string and c-style string. Vectors also support assignment via an initializer list, just like we did with std::array.
+	std :: vector<int> vec {1,2,3,4,5};
+	
+	std :: cout << vec.size();		// 5
+	std :: cout << vec.capacity();	// 5
+	std :: cout << vec.max_size;	// a very large number
+	
+	std :: cout << vec.at(0);	//1
+	std :: cout << vec[1];		// 2
+	
+	std :: cout << vec.front();	// 1
+	std :: cout << vec.back();	// 5
+
+So let's look at some other methods provided by the vector. Again, please refer to the c++ STL documentation for more detail on these and other methods. There's a lot there and that's the place to look for information, but let's see some other methods. Let's start with size(). This method returns the number of elements that are in the vector. That's pretty straightforward. The capacity() method tells us the current capacity of the vector. When this capacity is exceeded, that's when the vector will expand dynamically. max_size() tells us what the max size of a vector that would be in our system and that's the number of elements that it can hold. Usually, this is a really large number. Vectors also let us access individual elements either using the subscript operator or the at() method, just as we've seen before. The subscript operator does not do any bounds checking and the at() method does. You can see in the example code above that vec.at(0) will refer to the 1 and vec[1] will refer to the 2.
+	Person p1 {"Larry", 18};
+	std::vector<Person> vec;
+
+	vec.push_back(p1);		// add p1 to the back
+	vec.pop_back();			// remove pl from the back
+
+	vec.push_back(Person{"Larry", 18});
+
+	vec.emplace_back("Larry", 18);		// efficient!!
+
+As previously mentioned, the vector allows for efficiently inserting elements at the back of the vector. This is done with the push_back() method. In this case, we have a vector of Person objects. We can create a Person 'p1' named Larry, who's 18 years old and we can use the push_back() method to insert 'p1' at the back of the vector. Remember, all container classes make copies of the elements they store. So in this case, a copy of 'p1' is made. In the second example, we're creating an unnamed Person object and adding it to the back of the vector using move semantics. The last method we haven't seen yet and it's awesome, it's called emplace_back(). This method expects the parameters that would normally be passed into the Person constructor and that's what it does, it constructs the Person object using the Person constructor right in place where it's supposed to be in the vector. That's really efficient. No moves, no copies. It just puts it right where it's supposed to be. So, use this method, it's awesome.
+	std::vector<int> vec1 {1,2,3,4,5};
+	std::vector<int> vec2 {10,20,30,40,50};
+	
+	std::cout << vec1.empty();		// 0 (false)
+	vec1.swap(vec2);				// swaps the 2 vector
+
+	std::sort(vec1.begin(),vec1.end());
+
+The empty() method will return true if the vector is empty and false otherwise. Just as we saw with std::array, we can swap 2 vectors. In the case of vectors, the vector elements have to be the same type but the sizes can be different. And finally, we can use the std::sort() algorithm to sort vectors.
+	std::vector<int> vec1 {1,2,3,4,5};
+	std::vector<int> vec2 {10,20,30,40,50};
+
+	auto it = std::find(vec1.begin(), vec1.end(), 3);
+	vec1.insert(it, 10);	// 1,2,10,3,4,5
+
+	it = std::find(vec1.begin(), vec1.end(), 4);
+	vec1.insert(it, vec2.begin(), vec2.end()); 	// 1,2,10,3,10,20,30,40,50,4,5
+
+So let's see how we can insert elements into a vector at a place other than the back. First, we'll create two vectors of integers, 'vec1' and 'vec2'. 'vec1' is having 1,2,3,4 and 5, and 'vec2' is having 10,20,30,40 and 50. Now let's say we want to insert some data before the element 3 in 'vec1'. First, we need an iterator to point to the location in the vector where we want to insert the data before, in this case, the element 3. We can use the std::find() algorithm to easily find the element 3 as we've already seen. Once the 'it' iterator is pointing to the element 3 in the 'vec1', then we could call the insert() method and pass in the iterator 'it' and the element we want to insert before it, in this case, the 10. That's it. Now 'vec1' contains 1,2,10,3,4 and 5. So we inserted the element 10 before the element 3. That was pretty easy but we can also insert a sequence of elements. How? With iterators. Let's insert the entire contents of 'vec2' before the element 4 in 'vec1'. We first find the element 4 and get an iterator to it. We'll store it in variable 'it'. Then we can use the insert() method and pass in the iterator 'it' that we want to insert before and the two iterators that will provide the sequence of elements from 'vec2' that we want to insert. In this case, all elements of 'vec2'. That's it. Now 'vec1' will be having 1,2,10,3,10,20,30,40,50,4 and 5. We inserted a copy of the elements of 'vec2' before the 4. Very powerful and easy to do.
+

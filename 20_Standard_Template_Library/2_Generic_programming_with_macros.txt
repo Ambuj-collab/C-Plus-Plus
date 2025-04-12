@@ -1,0 +1,69 @@
+According to Bjarne Stroustrup, the inventor of c++, generic programming is "writing code that works with a variety of types as arguments as long as those argument types meet the specific syntax and semantic requirements". So why is generic programming such a big deal. Well, it's because if I have code that's written to be generic, then I should be able to use any types with that code as long as it makes sense and it should work. We'll see this specific example later. But what if I wanted to have a function that took a number as a parameter and returned the square of that number. With generic programming, I should be able to pass in any numeric type into that function, and it will return the correct result. So it should work with int, short int, long, long long, float, double and so forth, you get the idea. But we have a bit of a problem. The c++ compiler is statically typed. So it needs to know the type being passed into that function, so it can type check it. So if I write the function to expect an integer, then I won't be able to call it correctly with a double. So how can we get this to work in c++. There's a couple of ways. In this video, we'll look at macros. And in the next several videos, we'll learn about function template and class template. Be very careful when you use macros in practice, especially macros that use arguments. So you might be thinking why am I showing it to you then? Well, sometimes the best way to teach how to do something correctly is to first teach how to do it in a way that's inferior. Second, you'll likely see this out there in production code. There's a ton of legacy c++ code out there and macros are used in much of that code. Macros are used more extensively in C code though, and we sometimes see C code used with c++ code. Now we've actually already used a macro. Remember, when we created the include guards around our .h header files, we used #define, well that's a macro. In the context of header guards and conditional compilation, it's okay to use macros. But don't use macros in your code as I'll show you here.
+
+So let's see how these macros work. First, the macros begin with a pound sign(i.e., #), and we know that all directives that begin with the pound sign are preprocessor directives. And what else do we know? Well, we know that the preprocessor doesn't know c++. So there is no type information associated with macros. The preprocessor is just doing simple substitution. 
+	#define MAX_SIZE 100
+	#define PI 3.14159
+
+Notice the first #define defines the name MAX_SIZE to be 100. Notice that the 100 has no type associated with it, it's just a 100. The second #define defines the name PI to be 3.14159. Now if we use these names in our program, the preprocessor will replace the names with what we defined them to represent. Notice that there's no semicolon at the end of the macros. If there was, then the semicolon would also be copied and that's not usually what we want.
+	if (num > MAX SIZE)
+		std::cout << "Too big";
+
+	double area = PI * r * r;
+
+Above, we can see MAX_SIZE being used in the expression in the if statement, and PI is being used in a calculation. The preprocessor will first remove the #define statements from our code, then it goes through the program and replaces any defined names with what we defined them to be. You can see below, the values being replaced here in the if statement and the calculation. Now the processed file is sent to the compiler.
+	// #define MAX_SIZE 100		// removed
+
+	// #define PI 3.14159		// removed
+
+	if (num > 100)
+		std::cout << "Too big";
+
+	double area = 3.14159 * r * r;
+
+It looks simple and it is, but there's a better way to do this and we learned it a long time ago. We used constants. Constants are typed, and they're known to the compiler. I know what you're thinking. What does this have to do with generic programming, I'll show you below. 
+	int max (int a, int b) {
+		return (a > b) ? a : b;
+	}
+
+	int x = 100;
+	int y = 200;
+	std::cout << max(x, y);		// displays 200
+	
+Suppose we want to write a function that expects two integers and returns the maximum of those two integers. We could easily write that max function as you can see above. Note that we're using the conditional operator. So it evaluates a > b. And if it's true then 'a' is returned, otherwise 'b' is returned. Simple if else logic. Now we can define two ints i.e., x and y, call the max function with x and y as parameters and it works perfectly. Okay. So what -- where's the generic programming? 
+	int max(int a, int b) {
+		return (a > b) ? a : b;
+	}
+
+	double max(double a, double b) {
+		return (a > b) ? a : b;
+	}
+
+	char max(char a, char b) {
+		return (a > b) ? a : b;
+	}
+
+Now suppose we need a max function for doubles and another one for characters and we could have another one for floats and longs, so you get the idea. We could end up writing many of these max functions, as shown above. The code is the same for all of them. The code is the same for all of them. It's that code with the conditional operator. The only thing that changes is the types of the parameters. Remember, the idea behind generic programming. I should be able to use max with any types as long as they make sense. But how can I do that without writing many versions of this function like we did here. Well, one way is to use macro with parameters. 
+	#define MAX(a, b) ((a > b) ? a : b)
+
+	std::cout << MAX(10, 20) << std::endl;		// 20
+	std::cout << MAX(2.4, 3.5) << std::endl;	// 3.5
+	std::cout << MAX ('A', 'C') << std::endl;	// C
+
+Above, we're defining a macro named MAX that expects two arguments, a and b. And we can define it to be the conditional expression we saw earlier. So when the preprocessor sees MAX with two arguments, it will replace it with what we defined it in the macro, and it will also replace the arguments a and b. So now we have no functions defined, just a single macro called MAX. We can now use MAX in our code with arguments as you see in the examples above, it works fine. That's an example of generic programming. Remember, the preprocessor is simply substituting. It doesn't know c++, so problems can occur once the compiler tries to compile the processed code.
+	#define SQUARE(a) a*a
+
+	result = SQUARE(5);	// Expect 25
+	Replaced by preprocessor --> result = 5*5;		// Get 25
+
+	result = 100/SQUARE(5);		// Expect 4	
+	Replaced by preprocessor --> result = 100/5*5;			// Get 100!
+
+We have to be very careful with macros. Here's an example. Suppose we want a simple macro that's defined as #define SQUARE with a single argument a, and it's defined as a*a. Looks simple, and it is. But there's a few problems here. Now we can use that macro in result = SQUARE(5). SQUARE(5) will be replaced with 5*5 and all is good. But look at the next example, result = 100/SQUARE(5). What we expect is 100/25, which is 4, but that's not what we get. We get 100. Again, blind substitution. So how can we make this better. 
+	#define SQUARE(a) ((a)*(a)) // note the parenthesis
+	result = SQUARE(5);		// Expect 25
+	Replaced by preprocessor --> result = ((5)*(5));		// Still Get 25
+
+	result = 100/SQUARE (5);	// Expect 4
+	Replaced by preprocessor --> result = 100/((5)*(5));		// Now we get 4 !!
+	
+When we use macros, we can wrap up all the arguments in parentheses. This is the best practice. Now we give ourselves a better chance that the result will be correct. In this case, we now get what we expect. So why do we want to do this because the compiler isn't doing it, the preprocessor is doing it, and it doesn't know the syntax or semantics of c++. Don't use macros with arguments in your code. If you have legacy code, understand how it works so that you can better test the code. So what's a better way to write these max and square functions so that we can use generic programming and let the compiler do the work. We can use templates. In this case, function templates.

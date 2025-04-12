@@ -1,0 +1,116 @@
+Now, we'll learn more about the stl list and forward_list containers. These are both sequence containers and store their elements in non-contiguous memory. They don't provide direct access to elements via the at() method or subscript operator, but they're very efficient when we need to insert and delete elements in the list once an element is found.
+
+STL list:
+============
+Let's first talk about the list and then we'll talk about the forward_list after. In order to use the list container, we have to include the <list> header file. The list acts as a doubly linked list of elements, so we can go from element to element in either direction. Remember, list does not support direct element access. The list has a front and a back, and we can use all of the iterators but the iterators may become invalid when deleting elements.
+	std::list<int> d1l{1,2,3};
+
+So let's see what a doubly linked list looks like conceptually. In this slide(see page number 832 of LPA-Beginning-C++-Programming-From-Beginner-to-Beyond-SEP2024.pdf), we see a diagram of what a simple list looks like. Notice that the elements are not contiguous in memory. An element has a reference to the element after it and before it if they exist, that's why it's referred to as a doubly linked list. So there is some overhead involved with maintaining these links. We declare 'dll' as a list of integers and initialize it with 1,2 and 3. The list has a front and a back. The front in this case is the element 1 and the back is the element 3. With the list, we can efficiently add and remove elements from anywhere in the list once the position of the element is known. All we really have to do is remove or insert the element and then re-link the links to the other elements around it. Inserting and removing elements is very efficient but in order to do that, we need to have an iterator to the element that we want to remove or insert before. This is usually done with the std::find() method and it's done in linear time. If you need a container where you will have lots of insertions and removals from the container and you don't need direct access to the elements, then the list is a good choice.
+	std::list<int> l{1,2,3,4,5};
+	std::list<int> l1(10,100); 		// ten 100s
+
+	std::list<std::string> stooges {
+		std::string{"Larry"},
+		"Moe",
+		std::string{"Curly"}
+	};
+
+	l = {2,4,6,8,10};
+
+In the above example, I declared 'l' as a list of integers and initialized it with 1,2,3,4 and 5. Also, I declared 'l1' as a list of integers and I'm using an overloaded constructor to allocate space for 10 integers and initialize them all to 100. In the third example, I'm declaring 'stooges' as a list of strings and initializing it with std::string and c-style strings. Like vector, std::array and deque, list also support assignment via initializer list.
+	std::list<int> l{1,2,3,4,5};
+
+	std::cout << l.size();		// 5
+	std::cout << l.max_size();	// a very large number
+
+	std::cout << l.front();		//1
+	std::cout << l.back();		// 5
+
+So let's see some other common methods provided by the list. Let's start with the size() method. This method returns the number of elements that are in the list. And max_size() tells us what the maximum number of elements a list can contain. Remember, list does not allow direct access to elements, so we can't use the subscript operator or the at() method. These are not available for list container. The list also provides front() and back() methods that return references to the element at the front and the element at the back of the list. In this example, l.front() refers to the element 1 and l.back() refers to the element 5.
+	Person p1 {"Larry", 18};
+	std::list<Person> l;
+
+	l.push_back(p1);	// add p1 to the back
+	l.pop_back();		// remove p1 from the back
+
+	l.push_front(Person{"Larry", 18});
+	l.pop_front();			// remove element from the front
+
+	l.emplace_back("Larry", 18);		// add to back efficient !!
+	l.emplace_front("Moe", 24);			// add to front
+
+The list allows for efficiently inserting elements at the back and at the front. This is done with the push_back() method and the push_front() method. We also have pop_back() and pop_front() which efficiently remove elements from the back or the front. Above, we have a list of Person objects called 'l'. We can create a Person 'p1' named "Larry" who is 18 years old and we can use the push_back() method to insert 'p1' at the back of the list. We can also remove it using pop_back(). Similarly, we can add a Person object to the front of the list with push_front() method and remove it with pop_front() method. The list container also supports emplace_front() and emplace_back() which are efficient ways to create and initialize objects that we want to store in the list right in place.
+	std::list<int> l {1,2,3,4,5};
+	auto it = std::find(l.begin(), l.end(), 3);
+
+	l.insert(it, 10);		// 1 2 10 3 4 5
+
+	l.erase(it);		// erases the element 3, now the lost contains 1 2 10 4 5
+
+	l.resize(2);		// 1 2
+
+	l.resize(5);		// 1 2 0 0 0
+
+Inserting elements into a list works a little differently from what we've seen with other containers. We can insert an element before an existing element using the insert() method but the insert() method expects an iterator that's referencing to the element we want to insert before. In the above example, 'l' is a list of integers and I initialized it with 1,2,3,4 and 5. Now, I need an iterator to point to an element in the list. We can do this lots of ways but let's use the std::find() function. We can call std::find() with l.begin(), l.end() and we're looking for the element 3. In this case, the iterator 'it' is now referencing to the element 3 in the list. If we now call l.insert() and pass in 'it' which is the iterator and the number we want to insert, in this case, 10. The element 10 will be inserted very efficiently before the element 3. The iterator 'it' will not be invalidated, it still references the element 3. Now if we call l.erase() and pass in the iterator 'it', the element 3 will be removed from the list and the iterator 'it' will become invalid now. Lists also allow resizing. We can resize 'l' to a size of 2 in which case all the elements after the second element will be removed. If we resize to a value larger than what we currently have, the list will be expanded to that many elements and the default initializer for the type of object the list contains will be called and those elements will be created and added to the list. So in this case, if we resize 'l' to 5, we'll add 3 new elements to the list and they'll all be initialized to 0 in this case because they're integers.
+	std::list<int> l {1,2,3,4,5};
+	auto it = std::find(l.begin(), l.end(), 3);
+	std::cout << *it;	// 3
+	it++;
+	std::cout << *it;	// 4
+	it--;
+	std::cout << *it;	// 3
+
+Finally, how do we traverse a list. We can use a range-based for loop or we can use iterators. Since lists are bi-directional, we can iterate in both directions. So above, we have a list 'l' initialized with 1,2,3,4 and 5 and we have an iterator 'it' that will be referring to the element 3. When we de-reference 'it' and display the element, we get 3. Then we can increment the iterator 'it' and now it refers to the element 4. We can display the 4 in the same way. Finally, we can decrement the iterator 'it' and we get right back to the element 3.
+
+STL forward_list:
+====================
+
+Now let's see what some of the differences are between a list and a forward_list. The forward_list was added to the stl in c++11. In order to use the forward_list, we must include the <forward_list> header file. The forward_list acts as a singly linked list, so the forward_list can only be traversed in one direction. The forward_list incurs less overhead than the list but the downside is that we can only use it in one direction. But in many cases, this is exactly what we want. Similar to the list, the forward_list allows for rapid insertion and deletion of element once we have an iterator to one of the elements. Also the forward_list does not support direct element access. As we'll see in a moment, the forward_list has no concept of back, only front. It doesn't make much sense to get to the back of a forward_list and then not to be able to traverse backwards, so it's not available. Obviously, reverse iterators make no sense either, so they're not supported.
+	std::forward_list<int> 1{1,2,3};
+
+So, let's see what a forward_list might look like. In this slide(see page number 839 of LPA-Beginning-C++-Programming-From-Beginner-to-Beyond-SEP2024.pdf), we see a diagram of what a simple forward_list might look like. We declared 'l' as a forward_list of integers and initialize it with 1,2 and 3. The forward_list has only a front, no back. The front in this case is the element 1. With a forward_list, we can officially add elements to the front using push_front() method. You can see the pointers are going in only one direction.
+	std::forward_list<int> l {1,2,3,4,5};
+	std::cout << l.size();		// Not available
+	std::cout << l.max size;	// a very large number
+	std::cout << l.front();		// 1
+	std::cout << l.baek();		// Not available
+
+So let's see some of the common methods used with forward_list. Let's start with the size() method. It's not available. There's an interesting discussion about why the decision was made to not provide a size() method. If you're interested, please see below the Q&A section. The max_size() will tell us the maximum number of elements the forward_list can store. Also notice that we have a front() method but no back() method. In this case, the front() method returns a reference to the element 1.
+	Person p1 {"Larry", 18};
+	std::forward_list<Person> l;
+
+	l.push_front(p1);		// add p1 to the front
+	l.pop_front();			// remove p1 from the front
+
+	l.emplace_front("Moe", 24};		// add to front
+
+Since the forward_list only uses front and not back, we have push_front(), pop_front() and emplace_front() available for quick insertion of elements at the front of the forward_list.
+	std::forward_list<int> l {1,2,3,4,5};
+	auto it = std::find(l.begin(), l.end(), 3);
+
+	l.insert_after(it, 10);		// 1 2 3 10 4 5
+	l.emplace_after(it, 100);	// 1 2 3 100 10 4 5
+
+	l.erase_after(it);		// erases the 100, 1 2 3 10 4 5
+
+	l.resize(2);		// 1 2
+
+	l.resize(5);		// 1 2 0 0 0
+
+So since the forward_list is a singly linked list, it makes sense to insert elements into the forward_list after an iterator reference. So the forward_list supports methods named explicitly like what they do. In this example, 'l' is a forward_list of the integers 1,2,3,4 and 5. We have an iterator 'it' that points to the element 3. We can now use l.insert_after() and pass in the iterator 'it' and the object/element we want to insert. In this case, the element 10 will be inserted after the element 3. Notice that there are no insert(), emplace() and erase() methods. They're all called insert_after() and emplace_after() and erase_after(). The iterator 'it' doesn't invalidate in this case, it still points to the element 3. So we can also use emplace_after() and erase_after() in the same way. Also the forward_list allows resizing in the same way that the list does.
+
+While doing pratice in the IDE, I will be including <iterator> header file and that's for this std::advance() function. It basically allows us to advance an iterator. We can't really do += or -= on list iterators but we can advance some position using the advanced function.
+
+
+Q&A:
+=======
+1) Why size() method is not supported by forward_list container?
+Ans) The reason is that it is not possible to store or compute the current number of elements in constant time.
+
+The rationale the designers used was, "Maintaining a count doubles the size of a forward_list object (one word for the list head and one for the count) and it slows down every operation that changes the number of nodes. In most cases, this isn't a change in asymptotic complexity (the one change in asymptotic complexity is in one of the forms of splice), but it is nonzero overhead. It's a cost that all users would have to pay for, whether they need this feature or not, and for users who care about maintaining a count, it's just as easy to maintain it outside the list by incrementing the count with every insert and decrementing it with every erase, as it is to maintain the count within the list."
+
+More detail can be found here for those that are interested:
+http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2543.htm
+
+The fact that std::forward_list does not have a size() method is sometimes seen in C++ technical interviews.
+ 

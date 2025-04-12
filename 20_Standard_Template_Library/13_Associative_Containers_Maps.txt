@@ -1,0 +1,84 @@
+We'll learn about the STL map containers. These are also associative containers. They're collection of stored objects that allow for fast retrieval using a key. The STL provides both set and map. We saw set in the last video. In this video, we'll learn about map. The STL has four types of map containers: the map, the unordered_map, the multi_map and the unordered_multimap. We'll focus mainly on the map since it's the one that's most often used.
+
+We'll focus mainly on the map since it's the one that's most often used. In order to use the map, you must include the <map> header file. The map is like a dictionary where we have a key, a word in the case of a dictionary and an associated value, which would be its definition. Maps store their elements as key value pairs using the std::pair objects. The elements in the map are ordered by key and no duplicate keys are allowed. We can directly access an element from the map using the key and all iterators are available.
+	std::map<std::string, int> m1 {
+		{"Larry", 18},
+		{"Moe", 25}
+	};
+
+	std::map<std::string, std::string> m2 {
+		{"Bob", "Butcher"},
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+
+Let's initialize a few map objects. In the first example above, I declare 'm1' as a map of string-integer key-value pairs. The key is the string and the value is the integer. Then I initialize 'm1' with two key-value pairs, i.e., {Larry, 18} and {Moe, 25}. In the second example, I declare 'm2' as a map of string-string key value pairs and I'm initializing it to {Bob, Butcher}, {Anne, Baker}, {George, Candlestick maker}.
+	std::map<std::string, std::string> m {
+		{"Bob", "Butcher"},
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+
+	std::cout << m.size();		// 3
+	std::cout << m.max_size();	// a very large number
+
+We'll use the map 'm' for the next several examples. The size() method returns the number of elements that are in the map, 3 in this case, and max_size() will tell us the maximum number of elements the map can contain. Maps have no concept of front or back.
+	std::map<std::string, std::string> m {
+		{"Bob", "Butcher" },
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+
+	std::pair<std::string, std::string> pl {"James", "Mechanic"};
+	m.insert(p1);
+
+	m.insert(std::make_pair("Roger", "Ranger"));
+
+Now, we'll see how we can add elements to the map. So, let's see how we can insert elements into a map. We can use the insert() method as shown above. Remember, map consists of std::pair objects where the first attribute is the key and the second attribute is the value. We can create 'p1' as a std::pair object of type string-string and initialize it to {James, Mechanic}. "James" is the key, "Mechanic" is the value. We can then insert 'p1' into the map 'm', since 'm' is a map of string-string key-value pairs, pretty easy! We can also use the std::make_pair() function to make it even easier for us to create those key-value pairs and we can insert them right into the map. You can see the last example how easy it is. In this case, we're adding the key-value pair, {Roger, Ranger} to the map.
+	std::map<std::string, std::string> m {
+		{"Bob", "Butcher" },
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+	
+	m["Frank"] = "Teacher";		// insert
+
+	m["Frank"] = "Instructor";		// update value
+	m.at ("Frank") = "Professor";	// update value
+
+So, let's see another way we can insert elements into the map. We can use the subscript operator and the at() method to make the syntax pretty easy. Suppose I want to insert the {Frank, Teacher} key-value pair into the map 'm'. I can provide the key "Frank" in this case inside the square brackets and assign the value to it. This will insert the key-value pair into the map 'm' if the key doesn't exist. I can also modify existing map values in the same way and the syntax is dead simple. If I wanted to change the value associated with the key "Frank" from "Teacher" to "Instructor", I can simply use the subscript operator to do it. The at() method does the same thing with different syntax ofcourse but it will throw an exception if the key is not in the map.
+	std::map<std::string, std::string> m {
+		{"Bob", "Butcher"},
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+
+	m.erase("Anne");	// erase Anne
+
+	if(m.find("Bob") != m.end())	// find Bob
+		std::cout << "Found Bob!";
+
+	auto it = m.find("George");
+		if(it != m.end())
+			m.erase(it);	// erase George
+
+We can also erase elements from a map very easily. m.erase() and we’ll erase the key-value pair whose key is "Anne" from the map. We can also use the find() method to get an iterator to a map's element. As with the set, for efficiency, use the member method find(), not the std::find() function in the algorithm library. In the second example, I'm finding the key "Bob" in the map. If I get back an iterator and that's not pointing to the end of the map, then I found the matching element. If I wanted to erase that element, I can simply call m.erase() and pass in the iterator. In the last example, that's exactly what I'm doing. I'm looking for the key "George" in the map and if it's in there, I'm erasing it.
+	std::map<std::string, std::string> m {
+		{"Bob", "Butcher"},
+		{"Anne", "Baker"},
+		{"George", "Candlestick maker"}
+	};
+	
+	int num = m.count("Bob"); 		// 0 or 1
+
+	m.clear();
+
+	m.empty();
+
+Finally, we can use the count() method, the same way we did with std::set. It's an easy way to see if an element exists in the map. If it does exist, count() will return 1 and if it doesn't, count() will return 0. As we've seen with all the STL containers, the clear() method removes all elements from the map and the empty() method returns true if the map is empty, false otherwise. Well, that's a quick summary of the map class. As I mentioned previously, with all the STL components, there's much more to learn. Please become familiar with the basics and then take your learning to the next level by studying the STL documentation.
+
+Let's see some of the other map containers provided by the STL. The multi_map class is also defined in the <map> header file. A multi_map is a map that's ordered by key but does allow duplicate keys. All iterators are available to the multi_map.
+
+The unordered_map is in the <unordered_map> header file. The unordered_map is a map that's unordered. unordered_map does not allow reverse iterators.
+
+The last type of map provided by the STL is the unordered_multimap. The unordered_multimap does not order elements and it does allow duplicate keys, again no reverse iterators are allowed. These maps are very powerful and pretty easy to use.
